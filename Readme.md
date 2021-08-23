@@ -8,7 +8,7 @@ API to power the Agrivision project.
 -   Do not leak your API keys.
 -   Do not use the API for anything other than the Agrivision project.
 -   Create a different branch for each feature/bugfix.
--   Always lint your code before pushing. To do this, run `npm run lint` in the root directory.
+-   Always lint your code before pushing. To do this, run `npm run format` in the root directory.
 
 ## Before you start
 
