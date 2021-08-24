@@ -28,6 +28,9 @@ API to power the Agrivision project.
 -   Fork this repository. ([agri-api](https://github.com/AgriVision4U/agri-api))
 -   Clone your fork locally.
 -   Add upstream as a remote.
+```
+git remote add upstream git://github.com/AgriVision4U/agri-api.git
+```
 -   Install dependencies.
 
 ```
