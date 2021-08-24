@@ -2,6 +2,7 @@
 
 API to power the Agrivision project.
 
+#### **API documentation is available at [https://github.com/AgriVision4U/api-docs](https://github.com/AgriVision4U/api-docs).**
 ## **Contribution Guidelines**
 -   Do not push directly to this repository.<br>
 -   Please create a pull request, even if you have edit access.<br>
@@ -18,6 +19,11 @@ API to power the Agrivision project.
 
 -   Learn to use winston logger. You can use winston instead of `console.log()` to log and debug your API.
 
+## Learning Resources
+
+- [What is REST API](https://restfulapi.net/)
+- [REST API Design Best Practices](https://medium.com/hashmapinc/rest-good-practices-for-api-design-881439796dc9)
+- [Versioning REST APIs](https://www.freecodecamp.org/news/how-to-version-a-rest-api/)
 ## **Setting up local Development Environment**
 -   Fork this repository. ([agri-api](https://github.com/AgriVision4U/agri-api))
 -   Clone your fork locally.
