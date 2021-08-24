@@ -11,6 +11,9 @@
         "lint": "npx prettier --check src",
         "test": "jest"
     },
+    "engines": {
+        "node": "16.x"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC",
