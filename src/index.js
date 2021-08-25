@@ -4,6 +4,9 @@ const app = express();
 const db = require('./config/mongoose');
 const logger = require('./logger');
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use('/api', require('./api'));
 
 app.listen(process.env.PORT, (err) => {
