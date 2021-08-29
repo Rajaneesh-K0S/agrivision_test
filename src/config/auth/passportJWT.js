@@ -4,8 +4,8 @@ let ExtractJwt = require('passport-jwt').ExtractJwt;
 var opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.JWTsecret;
-opts.issuer = 'agrivision4u.com';
-opts.audience = 'agrivision4u.com';
+// opts.issuer = 'agrivision4u.com';
+// opts.audience = 'agrivision4u.com';
 
 const logger=require('../../logger')
 
