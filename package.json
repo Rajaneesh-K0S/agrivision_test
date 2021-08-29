@@ -19,10 +19,18 @@
     "license": "ISC",
     "dependencies": {
         "connect-mongo": "^4.5.0",
+        "bcrypt": "^5.0.1",
         "express": "^4.17.1",
         "express-session": "^1.17.2",
         "joi": "^17.4.2",
+        "jsonwebtoken": "^8.5.1",
         "mongoose": "^5.13.7",
+        "nodemailer": "^6.6.3",
+        "nodemon": "^2.0.12",
+        "passport": "^0.4.1",
+        "passport-google-oauth": "^2.0.0",
+        "passport-jwt": "^4.0.0",
+        "passport-local": "^1.0.0",
         "winston": "^3.3.3"
     },
     "devDependencies": {
