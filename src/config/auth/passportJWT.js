@@ -9,7 +9,7 @@ opts.audience = 'agrivision4u.com';
 
 const logger=require('../../logger')
 
-passport.use('jwt',new JwtStrategy(opts, function(jwt_payload, done) {
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
    // called everytime a protected URL is being served
    logger.info('err')
    User.findOne({id: jwt_payload.sub}, function(err, user) {
