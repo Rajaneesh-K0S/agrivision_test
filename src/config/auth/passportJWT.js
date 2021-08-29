@@ -12,7 +12,8 @@ const logger=require('../../logger')
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
    // called everytime a protected URL is being served
    logger.info('err')
-   User.findOne({id: jwt_payload.sub}, function(err, user) {
+   // payload has the email  not the id
+   User.findOne({email: jwt_payload.sub}, function(err, user) {
     if (err) {
         console.log(err)
         return done(err, false);
@@ -25,12 +26,12 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     }
 });
 }));
-
-passport.serializeUser(function(user, done) {
-  
-   return done(null, user)
-})
-passport.deserializeUser(function(obj, done) {
-   
-   return done(null, obj)
-})
+// not required  serialization and desensitization 
+// passport.serializeUser(function(user, done) {
+//  
+//   return done(null, user)
+// })
+// passport.deserializeUser(function(obj, done) {
+//   
+//   return done(null, obj)
+// })
