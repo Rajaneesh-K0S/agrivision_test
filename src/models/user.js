@@ -10,6 +10,22 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    password:{
+        type: String
+    },
+    provider:{
+        type:String
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
+    randString:{
+        type:String
+    },
+    provider:{
+        type:String
+    }
 });
 
 const User = mongoose.model('User', userSchema);
