@@ -192,7 +192,7 @@ module.exports.confirmEmail=async function(req,res){
 module.exports.resetPassword = async function (req, res) {
 
     try {
-        let user = await User.findOne({ randString: req.params.id });
+        let user = await User.findOne({ randString: req.params.secret });
         if (!user) {
           return res.status(400).json({
               message:"Bad Request",
