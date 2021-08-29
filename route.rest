@@ -1,0 +1,5 @@
+GET http://localhost:3000/api/v1/quiz/
+
+###
+GET http://localhost:3000/api/v1/quiz/612a97d7be74275fbc15b080
+
