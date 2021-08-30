@@ -10,21 +10,18 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password:{
+    password: {
         type: String
     },
-    provider:{
-        type:String
+    provider: {
+        type: String
     },
-    isVerified:{
-        type:Boolean,
-        default:false
+    isVerified: {
+        type: Boolean,
+        default: false
     },
-    randString:{
-        type:String
-    },
-    provider:{
-        type:String
+    randString: {
+        type: String
     }
 });
 

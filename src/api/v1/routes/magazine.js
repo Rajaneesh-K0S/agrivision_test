@@ -1,11 +1,11 @@
 const { Router } = require('express');
 const router = Router();
 
-const magazineController = require('../controllers/magazineController');
+const { allMagazine, specificMagazine } = require('../controllers/magazineController');
 
 
 
-router.get('/', magazineController.allMagazine);
-router.get('/:id', magazineController.specificMagazine);
+router.get('/', allMagazine);
+router.get('/:id', specificMagazine);
 
 module.exports = router;
