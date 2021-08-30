@@ -1,24 +1,22 @@
 const mongoose = require('mongoose');
 //const multer = require('multer');
-const path = require('path');
+// const path = require('path');
 //const ARTICLE_PATH = path.join('/uploads/articles');
 
 const articleSchema = new mongoose.Schema({
-    user: 
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User' 
-        }
-    ,
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     title: {
         type: String,
     },
     editor_pick: {
         type: Boolean,
-        default:false
+        default: false
     },
-    path:{
-        type:String
+    path: {
+        type: String
     }
 }, {
     timestamps: true
@@ -37,10 +35,7 @@ const articleSchema = new mongoose.Schema({
 // articleSchema.statics.upload = multer({storage:storage}).single('article_file');
 // articleSchema.statics.avatarPath = ARTICLE_PATH;
 
-  
 
-  
-
-const Article = mongoose.model('Article',articleSchema);
+const Article = mongoose.model('Article', articleSchema);
 
 module.exports = Article;
