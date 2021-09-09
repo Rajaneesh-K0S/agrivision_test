@@ -1,20 +1,10 @@
 const { User } = require('../../../models');
-// const { validateUser } = require('../validators');
-const jwt = require('jsonwebtoken');
-// const logger = require('../../../logger');
 const bcrypt = require('bcrypt');
-const randString = require('../../../utils/randString');
+const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
 
 module.exports.registerUser = async (req, res) => {
     try {
-        /*  let validUser = validateUser(req.body)
-         if (validUser.error) {
-             return res.status(400).json({
-                 message: validUser.error.details[0].message,
-                 success: false
-             });
-         } */
 
         let user = await User.findOne({ email: req.body.email });
 
@@ -35,7 +25,7 @@ module.exports.registerUser = async (req, res) => {
                       <br>
                       <h3>We welcome you as a part of our <b>AgriVision4U</b> family.</h3>
                       <p>Kindly click on the link below to confirm your e-mail address.</p>
-                      <a href='${process.env.siteURI}/api/v1/user/confirmEmail/${confirmationCode}'><h3> Click here</h3></a>
+                      <a href='${process.env.siteURI}/v1/user/confirmEmail/${confirmationCode}'><h3> Click here</h3></a>
                       <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                       <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
                       </div>`,
@@ -50,13 +40,7 @@ module.exports.registerUser = async (req, res) => {
             randString: confirmationCode
         });
 
-        let token = jwt.sign(
-            {
-                data: user.email,
-            },
-            process.env.JWTsecret,
-            { expiresIn: '1h' }
-        );
+        let token = generateToken(user);
 
         await user.save();
 
@@ -77,6 +61,7 @@ module.exports.registerUser = async (req, res) => {
 };
 
 module.exports.login = async function (req, res) {
+
     try {
         let user = await User.findOne({ email: req.body.email });
 
@@ -95,21 +80,16 @@ module.exports.login = async function (req, res) {
             });
         }
 
-        let token = jwt.sign(
-            {
-                data: user.email,
-            },
-            process.env.JWTsecret,
-            { expiresIn: '1h' }
-        );
+        let token = generateToken(user);
+
         res.status(200).json({
-            message: 'User loggedIn successfully',
+            message: 'User logged in successfully',
             data: {
-                user: user,
-                token: token,
+                user, token
             },
             success: true,
         });
+
     } catch (error) {
         res.status(500).json({
             message: 'something went wrong',
@@ -118,29 +98,10 @@ module.exports.login = async function (req, res) {
     }
 };
 
-module.exports.googleCallback = async function (req, res) {
-    try {
-        let token = jwt.sign(
-            {
-                data: req.user.email,
-            },
-            process.env.JWTsecret,
-            { expiresIn: '1h' }
-        );
-        return res.status(200).json({
-            message: 'user loggedin',
-            data: {
-                user: req.user,
-                token: token,
-            },
-            success: true,
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: 'something went wrong',
-            success: false,
-        });
-    }
+module.exports.googleOauth = async function (req, res) {
+    const user = await User.findOne({ email: req.user.email });
+    const token = generateToken(user);
+    return res.status(200).send({ token, user });
 };
 
 
@@ -153,16 +114,10 @@ module.exports.confirmEmail = async function (req, res) {
             user.isVerified = true;
             user.randString = null;
             await user.save();
-            let token = jwt.sign(
-                {
-                    data: user,
-                },
-                process.env.JWTsecret,
-                { expiresIn: '1h' }
-            );
+            let token = generateToken(user);
 
             return res.status(200).json({
-                message: 'Email verified.Welcome to AgriVision4u',
+                message: 'Email verified. Welcome to AgriVision4u',
                 data: {
                     user: user,
                     token: token,
@@ -234,11 +189,12 @@ module.exports.forgotPassword = async function (req, res) {
                   <h2>Hello ${user.name}</h2>
                   <br>
                   <p>Kindly click on the link below to reset your password.</p>
-                  <a href=${process.env.siteURI}/api/v1/user/resetPassword/${confirmationCode}> Click here</a>
+                  <a href=${process.env.siteURI}/v1/user/resetPassword/${confirmationCode}> Click here</a>
                   <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                   <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
               </div>`,
             });
+
             return res.send(200).json({
                 message: 'Please check your mail to reset password',
                 success: true

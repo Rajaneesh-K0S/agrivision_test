@@ -1,4 +1,4 @@
-const randString = () => {
+module.exports.randString = () => {
     let pass = '';
     let str = 'PQRSTUVWXIJKLMNO' +
         'abcdmnopqrsefghijkltuvwxyz01234YZABCDEFGH56789@$';
@@ -12,4 +12,11 @@ const randString = () => {
     return pass;
 };
 
-module.exports = randString;
+const jwt = require('jsonwebtoken');
+
+module.exports.generateToken = (user) => {
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+    });
+    return token;
+}

@@ -50,7 +50,7 @@ module.exports.specificArticle = async function (req, res) {
         if (req.user.articlesRemaining) {
 
           let mailOptions = {
-            from: process.env.email,
+            from: process.env.SMTP_EMAIL,
             to: process.env.editorMail,
             subject: Magazine,
             text: 'hello',

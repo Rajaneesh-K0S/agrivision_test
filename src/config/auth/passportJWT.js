@@ -4,20 +4,13 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 let opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWTsecret
+    secretOrKey: process.env.JWT_SECRET
 };
 
 const { User } = require('../../models');
-// opts.issuer = 'agrivision4u.com';
-// opts.audience = 'agrivision4u.com';
-
-// const logger = require('../../logger');
 
 passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
-    // called everytime a protected URL is being served
-    // payload has the email not the id
-
-    User.findOne({ email: jwt_payload.data }, function (err, user) {
+    User.findOne({ email: jwt_payload.email }, function (err, user) {
         if (err) {
             return done(err, false);
         }

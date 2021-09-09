@@ -1,11 +1,11 @@
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const GoogleTokenStrategy = require('passport-google-token').Strategy;
+
 const { User } = require('../../models');
 
-passport.use('google', new GoogleStrategy({
-    clientID: process.env.googleClientId,
-    clientSecret: process.env.googleClientSecret,
-    callbackURL: process.env.googleCallback
+passport.use(new GoogleTokenStrategy({
+    clientID: process.env.GOOGLEAUTH_CLIENTID,
+    clientSecret: process.env.GOOGLEAUTH_CLIENTSECRET,
 }, async function (accessToken, refreshToken, profile, done) {
     try {
         let user = await User.findOne({ email: profile._json.email });
