@@ -9,7 +9,7 @@ router.post('/login',login);
 router.get('/oauth/google',  passport.authenticate('google', { scope: ['profile','email'] }));
 router.get('/oauth/google/callback', passport.authenticate('google'),googleCallback);
 router.get('/confirmEmail/:secret',confirmEmail);
-router.post('/forgotPassword',forgotPassword)
+router.post('/forgotPassword',forgotPassword);
 router.post('/resetPassword/:id',resetPassword);
 
 module.exports = router;

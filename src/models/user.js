@@ -23,9 +23,9 @@ const userSchema = new mongoose.Schema({
     randString:{
         type:String
     },
-    provider:{
-        type:String
-    }
+    // provider:{
+    //     type:String
+    // }
 });
 
 const User = mongoose.model('User', userSchema);

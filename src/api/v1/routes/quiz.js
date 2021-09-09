@@ -1,15 +1,18 @@
 const { Router } = require('express');
 const router = Router();
 // const {isAdmin} = require('../config/middleware/isAdmin')
-const {showAllQuizzes,showQuiz}=require('../controllers/quizController');
+const {showAllQuizzes,startQuiz,saveAnswer,submitQuiz} = require('../controllers/quizController');
 
 router.get('/',showAllQuizzes);
 //612a97d7be74275fbc15b080
-router.get('/:id',showQuiz);
+router.get('/:id',startQuiz);
 
-router.post('/:id',async(req,res)=>{
+router.post('/:id',saveAnswer);
+router.get('/:id/submit',submitQuiz);
 
-});
+// router.post('/:id',async(req,res)=>{
+
+// });
 
 // router.get('/:id/calculate',isAdmin,async(req,res) =>{
 //     const {id} = req.params;
