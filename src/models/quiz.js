@@ -84,15 +84,16 @@ const questionSchema = new Schema({
 
 const Question = mongoose.model('Question',questionSchema);
 
+/*
 const chapter = new Schema({
     name:String,
-    // // sectionId:{
-    // //     type:Schema.Types.ObjectId,
-    // //     ref:'Section'
-    // // },
-    // totalCorrect: Number,
-    // totalIncorrect: Number,
-    // totalScore: Number,
+    sectionId:{
+        type:Schema.Types.ObjectId,
+        ref:'Section'
+    },
+    totalCorrect: Number,
+    totalIncorrect: Number,
+    totalScore: Number,
     video:[{
         type: Schema.Types.ObjectId,
         ref: 'videolecture'
@@ -101,22 +102,23 @@ const chapter = new Schema({
 })
 
 const Chapter = mongoose.model('Chapter',chapter);
+*/
 
-
-// const section= new Schema({
-//     name: String,
-//     sectionType: String,
-//     totalQuestions: Number,
+/*
+const section= new Schema({
+    name: String,
+    sectionType: String,
+    totalQuestions: Number,
     
-//     questions:[{
-//         type: Schema.Types.ObjectId,
-//         ref:'Question'
-//     }],
-//     // entanceExam: {
-//     //     type: Schema.Types.ObjectId,
-//     //     ref:'Entrance_exam'
-//     // }
-// })
+    questions:[{
+        type: Schema.Types.ObjectId,
+        ref:'Question'
+    }],
+    entanceExam: {
+        type: Schema.Types.ObjectId,
+        ref:'Entrance_exam'
+    }
+})*/
 
 
 // const Section = mongoose.model('Section',section);
