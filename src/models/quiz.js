@@ -162,7 +162,7 @@ const Rank = mongoose.model('Rank',rank);
 module.exports = {
     Quiz:Quiz,
     Question:Question,
-    Chapter:Chapter,
+//     Chapter:Chapter,
     Rank:Rank
 }
 
