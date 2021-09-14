@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
 
     randString: {
         type: String
+    },
+    completedChapter:{
+        type:Object
     }
 
 });

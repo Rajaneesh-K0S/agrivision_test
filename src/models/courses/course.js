@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const reviewSchema = new Schema({
+    review:String,
+    rating:Number,
+    user:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    }
+});
+
+
 const courseSchema = new Schema({
     name:String,
     image:String,
@@ -24,14 +34,6 @@ const courseSchema = new Schema({
     }] 
 });
 
-const reviewSchema = new Schema({
-    review:String,
-    rating:Number,
-    user:{
-        type:Schema.Types.ObjectId,
-        ref:'User'
-    }
-});
 
 const Course = mongoose.model('Course', courseSchema);
 module.exports = Course;
