@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const subTopicSchema = new Schema({
     name:String,
@@ -9,7 +9,7 @@ const subTopicSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Quiz'
     }       //if contentType is quiz
-})
+});
 
-const SubTopic=mongoose.model('SubTopic',subTopicSchema);
-module.exports=SubTopic;
+const SubTopic = mongoose.model('SubTopic', subTopicSchema);
+module.exports = SubTopic;

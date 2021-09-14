@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const courseSchema = new Schema({
     name:String,
@@ -12,10 +12,8 @@ const courseSchema = new Schema({
     highlights:[{
         type:String
     }],
-    feedbacks:[{
-        type:Schema.Types.ObjectId,
-        ref:'Feedback'
-    }],
+    subject:String,
+    feedbacks:[reviewSchema],
     chapters:[{
         type:Schema.Types.ObjectId,
         ref:'Chapter'
@@ -24,7 +22,16 @@ const courseSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Quiz'
     }] 
-})
+});
 
-const Course = mongoose.model('Course',courseSchema);
-module.exports = Course
+const reviewSchema = new Schema({
+    review:String,
+    rating:Number,
+    user:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    }
+});
+
+const Course = mongoose.model('Course', courseSchema);
+module.exports = Course;
