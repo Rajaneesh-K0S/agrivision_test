@@ -12,6 +12,7 @@ module.exports.allCourse = async function (req, res) {
         let data = [];
         courses.forEach(element => {
             data.push({
+                courseId: element._id,
                 name: element.name,
                 image: element.image,
                 duration: element.duration,
