@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     randString:{
         type:String
     },
+    coursesEnrolled:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Course'
+    }],
+
     // provider:{
     //     type:String
     // }
