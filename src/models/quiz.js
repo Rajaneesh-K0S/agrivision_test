@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const quizTableSchema = new Schema({
     name : String,
@@ -12,7 +12,7 @@ const quizTableSchema = new Schema({
         name:String,
         questions : [{
             type : Schema.Types.ObjectId,
-            ref : "Question"
+            ref : 'Question'
         }]
     }],
     //[0-Weekly,1-Test Series,2-Course]
@@ -20,11 +20,11 @@ const quizTableSchema = new Schema({
     totalNoQuestions : Number,
     relatedCourses : [{
         type : Schema.Types.ObjectId,
-        ref : "Course"
+        ref : 'Course'
     }],
     entranceExam : [{
         type : Schema.Types.ObjectId,
-        ref : "EnteranceExam"
+        ref : 'EnteranceExam'
     }],
     recommendedVideo : String,
     calculator : Boolean,
@@ -41,7 +41,7 @@ const quizTableSchema = new Schema({
     quizPrice : {
         type : Number
     }
-})
+});
 
 const Quiz = mongoose.model('Quiz', quizTableSchema);
 
@@ -56,7 +56,7 @@ const questionSchema = new Schema({
     marking: Number,
     negMarking:Number,
     options:[{
-       type: String
+        type: String
     }],
     correctAnswer: [{
         type: Number,
@@ -80,19 +80,20 @@ const questionSchema = new Schema({
     questionImage: {
         type: String
     }
-})
+});
 
-const Question = mongoose.model('Question',questionSchema);
+const Question = mongoose.model('Question', questionSchema);
 
+/*
 const chapter = new Schema({
     name:String,
-    // // sectionId:{
-    // //     type:Schema.Types.ObjectId,
-    // //     ref:'Section'
-    // // },
-    // totalCorrect: Number,
-    // totalIncorrect: Number,
-    // totalScore: Number,
+    sectionId:{
+        type:Schema.Types.ObjectId,
+        ref:'Section'
+    },
+    totalCorrect: Number,
+    totalIncorrect: Number,
+    totalScore: Number,
     video:[{
         type: Schema.Types.ObjectId,
         ref: 'videolecture'
@@ -101,22 +102,23 @@ const chapter = new Schema({
 })
 
 const Chapter = mongoose.model('Chapter',chapter);
+*/
 
-
-// const section= new Schema({
-//     name: String,
-//     sectionType: String,
-//     totalQuestions: Number,
+/*
+const section= new Schema({
+    name: String,
+    sectionType: String,
+    totalQuestions: Number,
     
-//     questions:[{
-//         type: Schema.Types.ObjectId,
-//         ref:'Question'
-//     }],
-//     // entanceExam: {
-//     //     type: Schema.Types.ObjectId,
-//     //     ref:'Entrance_exam'
-//     // }
-// })
+    questions:[{
+        type: Schema.Types.ObjectId,
+        ref:'Question'
+    }],
+    entanceExam: {
+        type: Schema.Types.ObjectId,
+        ref:'Entrance_exam'
+    }
+})*/
 
 
 // const Section = mongoose.model('Section',section);
@@ -153,14 +155,14 @@ const rank = new Schema({
     },
     minMarks:Number,
     totalMarks:Number
-})
+});
 
-const Rank = mongoose.model('Rank',rank);
+const Rank = mongoose.model('Rank', rank);
 
 module.exports = {
     Quiz:Quiz,
     Question:Question,
-    Chapter:Chapter,
+    //     Chapter:Chapter,
     Rank:Rank
-}
+};
 

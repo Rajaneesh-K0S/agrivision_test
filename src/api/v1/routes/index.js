@@ -8,6 +8,7 @@ const passport = require('passport');
 
 router.use('/user', require('./user'));
 router.use('/quiz', require('./quiz'));
+router.use('/course', require('./course'));
 
 
 router.use('/magazine', passport.authenticate('jwt', { session:false }), require('./magazine'));
