@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session(sessionConfig));
+// app.use(session(sessionConfig));
 app.use(passport.initialize());
 
 app.use('/', require('./api'));

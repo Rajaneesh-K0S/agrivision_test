@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const chapterSchema = new Schema({
     name:String,
@@ -7,7 +7,7 @@ const chapterSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Topic'
     }]
-})
+});
 
-const Chapter = mongoose.model('Chapter',chapterSchema);
+const Chapter = mongoose.model('Chapter', chapterSchema);
 module.exports = Chapter;

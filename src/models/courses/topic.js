@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const topicSchema = new Schema({
     name:String,
@@ -7,11 +7,11 @@ const topicSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'SubTopic'
     }],
-    freeTrialSubTopic:[{
+    freeTrialSubTopics:[{
         type:Schema.Types.ObjectId,
         ref:'SubTopic'
     }]
-})
+});
 
-const Topic = mongoose.model('CTopic',topicSchema);
+const Topic = mongoose.model('Topic', topicSchema);
 module.exports = Topic;

@@ -1,5 +1,5 @@
-const mongoose=require('mongoose');
-const {Schema} = mongoose;
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const examSchema = new Schema({
     name:String,
@@ -9,5 +9,5 @@ const examSchema = new Schema({
     }
 });
 
-const Exam = mongoose.model('Exam',examSchema);
-module.exports=Exam;
+const Exam = mongoose.model('Exam', examSchema);
+module.exports = Exam;
