@@ -8,6 +8,6 @@ const magazineSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Magazine = mongoose.model('Magazine',magazineSchema);
+const Magazine = mongoose.model('Magazine', magazineSchema);
 
 module.exports = Magazine;

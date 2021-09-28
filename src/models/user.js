@@ -10,27 +10,21 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password:{
+    password: {
         type: String
     },
-    provider:{
-        type:String
+    provider: {
+        type: String
     },
-    isVerified:{
-        type:Boolean,
-        default:false
+    isVerified: {
+        type: Boolean,
+        default: false
     },
-    randString:{
-        type:String
-    },
-    coursesEnrolled:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Course'
-    }],
 
-    // provider:{
-    //     type:String
-    // }
+    randString: {
+        type: String
+    }
+
 });
 
 const User = mongoose.model('User', userSchema);

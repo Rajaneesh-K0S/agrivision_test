@@ -1,4 +1,8 @@
 module.exports.User = require('./user');
+
+module.exports.Magazine = require('./magazine');
+module.exports.Article = require('./article');
+
 module.exports.QuizCollection = require('./quiz');
 module.exports.Magazine=require('./magazine');
 module.exports.Article=require('./article')
@@ -8,3 +12,4 @@ module.exports.Topic=require('./courses/topic');
 module.exports.SubTopic=require('./courses/subtopic');
 module.exports.Review=require('./courses/subtopic');
 module.exports.Exam=require('./exam');
+
