@@ -6,6 +6,7 @@ module.exports.Article = require('./article');
 module.exports.QuizCollection = require('./quiz');
 
 
+
 module.exports.Course = require('./courses/course');
 module.exports.Chapter = require('./courses/chapter');
 module.exports.Topic = require('./courses/topic');

@@ -78,7 +78,6 @@ const userSchema = new Schema({
         task:String,
         date:Date
     }]
-
 });
 
 const User = mongoose.model('User', userSchema);

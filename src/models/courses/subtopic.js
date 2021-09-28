@@ -5,6 +5,7 @@ const subTopicSchema = new Schema({
     name:String,
     contentType:Number, //0-pdf,1-video,2-quiz
     content:String, //if contentType is pdf or video
+    duration:Number,
     quiz:{
         type:Schema.Types.ObjectId,
         ref:'Quiz'
