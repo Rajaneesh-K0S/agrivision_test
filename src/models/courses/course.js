@@ -8,12 +8,13 @@ const reviewSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'User'
     }
-}, {timestamps : true});
+}, { timestamps : true });
 
 
 const courseSchema = new Schema({
     name:String,
-    image:String,
+    bigImage:String,
+    smallImage:String,
     duration:Number,
     userEnrolled:Number,
     rating:Number,  //total course rating
@@ -44,5 +45,5 @@ const courseSchema = new Schema({
 
 const Course = mongoose.model('Course', courseSchema);
 const Review = mongoose.model('Review', reviewSchema);
-module.exports = {Course, Review}
+module.exports = { Course, Review };
 

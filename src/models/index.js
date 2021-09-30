@@ -14,6 +14,9 @@ module.exports.Topic = require('./courses/topic');
 module.exports.SubTopic = require('./courses/subtopic');
 module.exports.Exam = require('./exam');
 
-module.exports.Event=require('./event')
+module.exports.Event = require('./event');
+
+
+module.exports.Cart = require('./cart');
 
 

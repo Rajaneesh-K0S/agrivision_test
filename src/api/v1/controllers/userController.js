@@ -1,4 +1,4 @@
-const { User } = require('../../../models');
+const { User, Cart } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
@@ -14,7 +14,6 @@ module.exports.registerUser = async (req, res) => {
                 success: false,
             });
         }
-
         let confirmationCode = randString();
         await transporter.sendMail({
             from: process.env.email,
@@ -212,5 +211,111 @@ module.exports.forgotPassword = async function (req, res) {
             message: 'something went wrong',
             success: false,
         });
+    }
+};
+
+
+module.exports.addToCart = async(req, res)=>{
+    //req.body =  courseId, testSeriesId
+    let userId = req.params.id;
+    let courseId = req.body.courseId;
+    let testSeriesId = req.body.testSeriesId;
+    try{
+         
+        if(courseId){
+            await Cart.updateOne({ user : userId }, { '$push' : { 'courses' : courseId } });
+            res.status(300).json({
+                message : 'successfully added course in cart',
+                success : true
+            });
+        }
+        else if(testSeriesId){
+            await Cart.updateOne({ user : userId }, { '$push' : { 'testSeries' : testSeriesId } });
+            res.status(300).json({
+                message : 'successfully added testSeries in cart',
+                success : true
+            });
+        }
+    }
+    catch(error){
+        res.status(400).json({
+            message : error.message,
+            success : false
+        });
+    }
+
+};
+
+
+module.exports.getCart = async (req, res)=>{
+    let userId = req.params.id;
+    try{
+        let cart = await Cart.findOne({ user : userId }).populate([{ path : 'testSeries', select : 'name description price smallImage' }, { path : 'courses', select : 'name description price smallImage' }]);
+        let testSeriesItems = [];
+        let courseItems = [];
+        let totalAmount = 0;
+        cart.testSeries.forEach(test=>{
+            totalAmount += test.price;
+            let itemObj = {};
+            itemObj['name'] = test.name;
+            itemObj['price'] = test.price;
+            itemObj['description'] = test.description;
+            itemObj['testSeriesId'] = test._id;
+            itemObj['image'] = test.smallImage;
+            testSeriesItems.push(itemObj); 
+        });
+        cart.courses.forEach(course=>{
+            totalAmount += course.price;
+            let itemObj = {};
+            itemObj['name'] = course.name;
+            itemObj['price'] = course.price;
+            itemObj['description'] = course.description;
+            itemObj['courseId'] = course._id;
+            itemObj['image'] = course.smallImage;
+            courseItems.push(itemObj); 
+        });
+         
+        let totalItems = testSeriesItems.length + courseItems.length;
+
+        res.status(200).json({
+            data : { totalItems, courseItems, testSeriesItems, totalAmount },
+            message : 'successfully fetched cart data',
+            success : true
+        });
+    }
+    catch(error){
+        console.log(error);
+        res.status(400).json({
+            message : error,
+            success : false
+        });
+    }
+};
+
+
+module.exports.deleteProductInCart = async function (req, res) {
+    let userId = req.params.id;
+    try{
+        //  courseId
+        // testSeriesId
+        let courseId = req.query.courseId;
+        let testSeriesId = req.query.testSeriesId;
+        if(courseId){
+            await Cart.updateOne({ user : userId }, { '$pull' : { 'courses' : courseId } });
+            res.status(300).json({
+                message : 'deleted successfully',
+                success : true
+            });
+        }
+        else if(testSeriesId){
+            await Cart.updateOne({ user : userId }, { '$pull' : { 'testSeries' : testSeriesId } });
+            res.status(300).json({
+                message : 'deleted successfully',
+                success : true
+            });
+        }
+    }
+    catch(error){
+        
     }
 };

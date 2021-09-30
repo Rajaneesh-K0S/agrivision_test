@@ -1,4 +1,4 @@
-const { Course, Chapter, SubTopic, User } = require('../../../models');
+const { Course, Chapter, SubTopic } = require('../../../models');
 const { mdToStringConverter } = require('../../../config/mdToString');
 
 module.exports.allCourse = async function (req, res) {
@@ -14,7 +14,7 @@ module.exports.allCourse = async function (req, res) {
             data.push({
                 courseId: element._id,
                 name: element.name,
-                image: element.image,
+                image: element.bigImage,
                 duration: element.duration,
                 chapters: element.chapters,
                 fullTests: element.fullTests
@@ -63,26 +63,26 @@ module.exports.courseById = async function (req, res) {
         // queryParam = 2 for payment page for a specific course
         else if(req.query.queryParam == 2){
             let courseId = req.params.id;
-            let course = await Course.findById(courseId).populate([{path : "feedbacks", populate : {path : "user", select : "name image"}}, {path : "similarCourses", select : "name userEnrolled image chapters fullTests"}]);
-            let ratingsCount = [0,0,0,0,0];
+            let course = await Course.findById(courseId).populate([{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
+            let ratingsCount = [0, 0, 0, 0, 0];
             let totalRatings = course.feedbacks.length;
             course.feedbacks.forEach(feedback=>{
-                ratingsCount[5-feedback.rating]++;
-            })
-            for(let i =0;i<ratingsCount.length ; i++){
-                ratingsCount[i] = ratingsCount[i]*100/totalRatings;
+                ratingsCount[5 - feedback.rating]++;
+            });
+            for(let i = 0;i < ratingsCount.length ; i++){
+                ratingsCount[i] = ratingsCount[i] * 100 / totalRatings;
             }
             let similarCourseData = [];
             course.similarCourses.forEach(course=>{
                 let obj = {};
                 obj['courseId'] = course._id;
                 obj['name'] = course.name;
-                obj['image'] = course.image;
+                obj['image'] = course.bigImage;
                 obj['userEnrolled'] = course.userEnrolled;
                 obj['chapterCount'] = course.chapters.length;
                 obj['fullTestCount'] = course.fullTests.length;
                 similarCourseData.push(obj);
-            })
+            });
             let courseData = {};
             courseData['courseId'] = course._id;
             courseData['name'] = course.name;
@@ -97,9 +97,9 @@ module.exports.courseById = async function (req, res) {
             courseData['similarCourses'] = similarCourseData;
             res.status(200).json({
                 data : courseData,
-                message : "payment page data fetched successfully",
+                message : 'payment page data fetched successfully',
                 success : true
-            })
+            });
         }
     } catch (error) {
         res.status(400).json({
