@@ -6,14 +6,17 @@ module.exports.Article = require('./article');
 module.exports.QuizCollection = require('./quiz');
 
 
-
-module.exports.Course = require('./courses/course');
+let exportedCourseObject = require('./courses/course');
+module.exports.Course = exportedCourseObject.Course;
+module.exports.Review = exportedCourseObject.Review;
 module.exports.Chapter = require('./courses/chapter');
 module.exports.Topic = require('./courses/topic');
 module.exports.SubTopic = require('./courses/subtopic');
-module.exports.Review = require('./courses/subtopic');
 module.exports.Exam = require('./exam');
 
-module.exports.Event=require('./event')
+module.exports.Event = require('./event');
+
+
+module.exports.Cart = require('./cart');
 
 
