@@ -216,10 +216,10 @@ module.exports.forgotPassword = async function (req, res) {
 
 
 module.exports.addToCart = async(req, res)=>{
-    //req.body =  courseId, testSeriesId
+
     let userId = req.params.id;
-    let courseId = req.body.courseId;
-    let testSeriesId = req.body.testSeriesId;
+    let courseId = req.query.courseId;
+    let testSeriesId = req.query.testSeriesId;
     try{
          
         if(courseId){
@@ -295,11 +295,9 @@ module.exports.getCart = async (req, res)=>{
 
 module.exports.deleteProductInCart = async function (req, res) {
     let userId = req.params.id;
+    let courseId = req.query.courseId;
+    let testSeriesId = req.query.testSeriesId;
     try{
-        //  courseId
-        // testSeriesId
-        let courseId = req.query.courseId;
-        let testSeriesId = req.query.testSeriesId;
         if(courseId){
             await Cart.updateOne({ user : userId }, { '$pull' : { 'courses' : courseId } });
             res.status(300).json({
