@@ -13,6 +13,8 @@ const reviewSchema = new Schema({
 
 const courseSchema = new Schema({
     name:String,
+    exam:String,
+    subject:String,
     bigImage:String,
     smallImage:String,
     duration:Number,

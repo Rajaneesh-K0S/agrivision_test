@@ -12,7 +12,7 @@ module.exports.Review = exportedCourseObject.Review;
 module.exports.Chapter = require('./courses/chapter');
 module.exports.Topic = require('./courses/topic');
 module.exports.SubTopic = require('./courses/subtopic');
-module.exports.Exam = require('./exam');
+
 
 module.exports.Event = require('./event');
 
