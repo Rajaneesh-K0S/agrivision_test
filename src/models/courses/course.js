@@ -8,12 +8,13 @@ const reviewSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'User'
     }
-});
+}, { timestamps : true });
 
 
 const courseSchema = new Schema({
     name:String,
-    image:String,
+    bigImage:String,
+    smallImage:String,
     duration:Number,
     userEnrolled:Number,
     rating:Number,  //total course rating
@@ -23,7 +24,10 @@ const courseSchema = new Schema({
         type:String
     }],
     subject:String,
-    feedbacks:[reviewSchema],
+    feedbacks:[{
+        type : Schema.Types.ObjectId,
+        ref : 'Review'
+    }],
     chapters:[{
         type:Schema.Types.ObjectId,
         ref:'Chapter'
@@ -31,9 +35,15 @@ const courseSchema = new Schema({
     fullTests:[{
         type:Schema.Types.ObjectId,
         ref:'Quiz'
+    }],
+    similarCourses : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Course'
     }] 
 });
 
 
 const Course = mongoose.model('Course', courseSchema);
-module.exports = Course;
+const Review = mongoose.model('Review', reviewSchema);
+module.exports = { Course, Review };
+

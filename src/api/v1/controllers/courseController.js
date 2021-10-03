@@ -14,7 +14,7 @@ module.exports.allCourse = async function (req, res) {
             data.push({
                 courseId: element._id,
                 name: element.name,
-                image: element.image,
+                image: element.bigImage,
                 duration: element.duration,
                 chapters: element.chapters,
                 fullTests: element.fullTests
@@ -44,7 +44,9 @@ module.exports.courseById = async function (req, res) {
                 data: course,
                 success: true
             });
-        }//queryParam = 1 for topic and subtopic list of a specific chapter( Desktop11 in figma). 
+        }
+        
+        //queryParam = 1 for topic and subtopic list of a specific chapter( Desktop11 in figma). 
         //Also specify anothery query parameter named "chapterID" which contains the id of the required chapter.
         else if (req.query.queryParam == 1) {
             let courseId = req.params.id;
@@ -56,6 +58,47 @@ module.exports.courseById = async function (req, res) {
                 message: 'course fetched',
                 data: { course, allChapters, chapter },
                 success: true
+            });
+        }
+        // queryParam = 2 for payment page for a specific course
+        else if(req.query.queryParam == 2){
+            let courseId = req.params.id;
+            let course = await Course.findById(courseId).populate([{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
+            let ratingsCount = [0, 0, 0, 0, 0];
+            let totalRatings = course.feedbacks.length;
+            course.feedbacks.forEach(feedback=>{
+                ratingsCount[5 - feedback.rating]++;
+            });
+            for(let i = 0;i < ratingsCount.length ; i++){
+                ratingsCount[i] = ratingsCount[i] * 100 / totalRatings;
+            }
+            let similarCourseData = [];
+            course.similarCourses.forEach(course=>{
+                let obj = {};
+                obj['courseId'] = course._id;
+                obj['name'] = course.name;
+                obj['image'] = course.bigImage;
+                obj['userEnrolled'] = course.userEnrolled;
+                obj['chapterCount'] = course.chapters.length;
+                obj['fullTestCount'] = course.fullTests.length;
+                similarCourseData.push(obj);
+            });
+            let courseData = {};
+            courseData['courseId'] = course._id;
+            courseData['name'] = course.name;
+            courseData['price'] = course.price;
+            courseData['chapterCount'] = course.chapters.length;
+            courseData['fullTestCount'] = course.fullTests.length;
+            courseData['description'] = course.description;
+            courseData['rating'] = course.rating;
+            courseData['highlights'] = course.highlights;
+            courseData['feedbacks'] = course.feedbacks;
+            courseData['ratingPercentages'] = ratingsCount;
+            courseData['similarCourses'] = similarCourseData;
+            res.status(200).json({
+                data : courseData,
+                message : 'payment page data fetched successfully',
+                success : true
             });
         }
     } catch (error) {

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const eventSchema = new Schema({
     heading:String,
@@ -10,5 +10,5 @@ const eventSchema = new Schema({
     }
 });
 
-const Event = mongoose.model('Event',eventSchema);
+const Event = mongoose.model('Event', eventSchema);
 module.exports = Event;
