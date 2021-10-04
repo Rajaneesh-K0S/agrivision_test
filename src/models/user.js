@@ -32,11 +32,12 @@ const userSchema = new Schema({
         ref: 'Course'
     }],
     courseProgress:[{
-          courseId:Schema.Types.ObjectId,
-          subTopics:[{
-              type:Schema.Types.ObjectId,
-              unique:true
-            }]
+        courseId:Schema.Types.ObjectId,
+        chapterId:Schema.Types.ObjectId,
+        subTopics:[{
+            type:Schema.Types.ObjectId,
+            unique:true
+        }]
     }],
     lastCompleted:{
         type: Schema.Types.ObjectId,
