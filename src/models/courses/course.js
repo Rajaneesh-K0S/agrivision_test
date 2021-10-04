@@ -25,7 +25,6 @@ const courseSchema = new Schema({
     highlights:[{
         type:String
     }],
-    subject:String,
     feedbacks:[{
         type : Schema.Types.ObjectId,
         ref : 'Review'

@@ -5,10 +5,10 @@ module.exports.allCourse = async function (req, res) {
     try {
         let courses;
         if(req.query.exam){
-            courses = await Course.find({'exam':req.query.exam});
+            courses = await Course.find({ 'exam':req.query.exam });
         }
         else if (req.query.subject) {
-            courses = await Course.find({'subject':req.query.subject});
+            courses = await Course.find({ 'subject':req.query.subject });
         } else {
             courses = await Course.find({});
         }
