@@ -13,6 +13,8 @@ const reviewSchema = new Schema({
 
 const courseSchema = new Schema({
     name:String,
+    exam:String,
+    subject:String,
     bigImage:String,
     smallImage:String,
     duration:Number,
@@ -36,6 +38,7 @@ const courseSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Quiz'
     }],
+    totalSubTopics:Number,
     similarCourses : [{
         type : Schema.Types.ObjectId,
         ref : 'Course'

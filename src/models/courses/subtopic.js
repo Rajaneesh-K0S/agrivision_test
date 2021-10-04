@@ -9,7 +9,10 @@ const subTopicSchema = new Schema({
     quiz:{
         type:Schema.Types.ObjectId,
         ref:'Quiz'
-    }       //if contentType is quiz
+    },       //if contentType is quiz
+    topicId:Schema.Types.ObjectId,
+    chapterId:Schema.Types.ObjectId,
+    courseId:Schema.Types.ObjectId
 });
 
 const SubTopic = mongoose.model('SubTopic', subTopicSchema);
