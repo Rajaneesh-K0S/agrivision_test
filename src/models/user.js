@@ -24,7 +24,6 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-
     randString: {
         type: String
     },
@@ -32,29 +31,24 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Course'
     }],
-    coursesProgress:[{
-        courseId: Schema.Types.ObjectId,
-        chapters:[{
-            chapterId: Schema.Types.ObjectId,
-            topics:[{
-                topicId:Schema.Types.ObjectId,
-                subTopics:[{
-                    subTopicId:Schema.Types.ObjectId,
-                    isCompleted:Boolean
-                }]
+    courseProgress:[{
+          courseId:Schema.Types.ObjectId,
+          subTopics:[{
+              type:Schema.Types.ObjectId,
+              unique:true
             }]
-        }]
     }],
     lastCompleted:{
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref:'SubTopic'
     },
     readingDuration:[{
         date:{
-            type:Date,
-            default:Date.now
+            type:String
         },
-        type:Number,
-        default:0
+        duration:{
+            type:Number
+        }
     }],
     testDuration:[{
         date:{
