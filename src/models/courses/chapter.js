@@ -6,7 +6,8 @@ const chapterSchema = new Schema({
     topics:[{
         type:Schema.Types.ObjectId,
         ref:'Topic'
-    }]
+    }],
+    totalSubTopics:Number 
 });
 
 const Chapter = mongoose.model('Chapter', chapterSchema);

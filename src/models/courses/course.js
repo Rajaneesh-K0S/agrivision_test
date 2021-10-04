@@ -38,6 +38,7 @@ const courseSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Quiz'
     }],
+    totalSubTopics:Number,
     similarCourses : [{
         type : Schema.Types.ObjectId,
         ref : 'Course'
