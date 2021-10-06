@@ -1,7 +1,6 @@
-require("dotenv").config();
 const Razorpay = require("razorpay");
 const crypto=require('crypto');
-const { User } = require('../../../models');
+// const { User } = require('../../../models');
 
 
 
@@ -42,7 +41,7 @@ module.exports.success= async (req, res) => {
         } = req.body;//extract user email and courseId and add course to the user 
 
      
-        const shasum = crypto.createHmac("sha256", razorpaySecret);
+        const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
 
         shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
 
