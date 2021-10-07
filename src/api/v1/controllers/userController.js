@@ -26,7 +26,7 @@ module.exports.registerUser = async (req, res) => {
                       <br>
                       <h3>We welcome you as a part of our <b>AgriVision4U</b> family.</h3>
                       <p>Kindly click on the link below to confirm your e-mail address.</p>
-                      <a href='${process.env.siteURI}/v1/user/confirmEmail/${confirmationCode}'><h3> Click here</h3></a>
+                      <a href='https://nifty-payne-c217e9.netlify.app?confirm=${confirmationCode}'><h3> Click here</h3></a>
                       <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                       <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
                       </div>`,
@@ -109,7 +109,7 @@ module.exports.googleOauth = async function (req, res) {
 
 module.exports.confirmEmail = async function (req, res) {
 
-    const secret = req.params.secret;
+    const secret = req.query.confirm;
     const user = await User.findOne({ randString: secret });
     try {
         if (user) {
@@ -129,7 +129,7 @@ module.exports.confirmEmail = async function (req, res) {
 
         } else {
             return res.status(400).json({
-                message: 'Bad request',
+                message: 'user doesnt exist',
                 success: false
             });
         }
@@ -188,7 +188,7 @@ module.exports.forgotPassword = async function (req, res) {
                   <h2>Hello ${user.name}</h2>
                   <br>
                   <p>Kindly click on the link below to reset your password.</p>
-                  <a href=${process.env.siteURI}/v1/user/resetPassword/${confirmationCode}> Click here</a>
+                  <a href='https://nifty-payne-c217e9.netlify.app?confirm=${confirmationCode}'> Click here</a>
                   <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                   <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
               </div>`,
