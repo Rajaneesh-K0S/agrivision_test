@@ -3,7 +3,7 @@ const CronJob = require('cron').CronJob;
 const { User } = require('../../models');
 
 var job = new CronJob('* * 1 * * *', async function() {
-    const user = User.find({});
+    const user =await User.find({});
     let date = new Date();
     date.setDate(date.getDate() - 1);
     user.forEach(user => {
