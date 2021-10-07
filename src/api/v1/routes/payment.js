@@ -1,9 +1,11 @@
 const { Router } = require('express');
 const router = Router();
-const {paymentController} = require('../controllers/paymentController');
+
+const {order,success} = require('../controllers/paymentController');
 const passport = require('passport');
 
-router.post('/payment',passport.authenticate('jwt', { session:false }),paymentController.order)
-router.post('/payment/success',paymentController.success)
+router.post('/:amount/:courseId',passport.authenticate('jwt', { session:false }),order)
+router.post('/success',success)
+
 
 module.exports = router;
