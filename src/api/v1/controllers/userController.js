@@ -2,6 +2,7 @@ const { User, Cart, SubTopic } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
+
 // const { boolean } = require('joi');
 
 module.exports.registerUser = async (req, res) => {
@@ -17,7 +18,7 @@ module.exports.registerUser = async (req, res) => {
         }
         let confirmationCode = randString();
         await transporter.sendMail({
-            from: process.env.email,
+            from: 'AgriVision4U <sprajapati14012002@gmail.com>',
             to: req.body.email,
             subject: 'Please confirm your Email',
             html: `<h1>Email Confirmation</h1>
@@ -179,9 +180,8 @@ module.exports.forgotPassword = async function (req, res) {
 
             user.randString = confirmationCode;
             await user.save();
-
             transporter.sendMail({
-                from: process.env.email,
+                from: 'AgriVision4U <sprajapati14012002@gmail.com>',
                 to: req.body.email,
                 subject: 'Reset Password',
                 html: `<h1>Reset Password</h1>
