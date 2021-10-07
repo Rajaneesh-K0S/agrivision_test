@@ -199,37 +199,37 @@ module.exports.markCompleted = async function(req, res){
 
 module.exports.courseProgress = async function(req, res){
     try {
-            const courseId = req.params.id;
-            let course = await Course.findOne({ _id : courseId}, {"totalSubTopics" : 1});
-            let user = await User.findById(req.user._id);
-            const data = user.courseProgress.filter(element => element.courseId == courseId);
-            if(!data){
-                return res.status(400).json({
-                    message : 'invalid id',
-                    success : false
-                });
-            }
-            let chapterWiseProgress = [];
-            let totalCompletedSubtopics = 0;
-            for(let i=0 ;i< data.length ;i++) {
-                totalCompletedSubtopics += data[i].subTopics.length;
-                let chapter = await Chapter.findOne({_id : data[i].chapterId}, {"totalSubTopics" : 1});
-                console.log(chapter);
-                let obj = {};
-                obj['chapterId'] = data[i].chapterId;
-                obj['completedSubtopics'] = data[i].subTopics.length;
-                obj['totalSubtopics'] = chapter.totalSubTopics;
-                console.log(obj);
-                chapterWiseProgress.push(obj);
-            }
-            let courseProgress = {};
-            courseProgress['completedSubtopics'] = totalCompletedSubtopics;
-            courseProgress['totalSubtopics'] = course.totalSubTopics;
-            return res.status(200).json({
-                message : "successfully fetched course progress",
-                data: {courseProgress, chapterWiseProgress},
-                success:true
+        const courseId = req.params.id;
+        let course = await Course.findOne({ _id : courseId }, { 'totalSubTopics' : 1 });
+        let user = await User.findById(req.user._id);
+        const data = user.courseProgress.filter(element => element.courseId == courseId);
+        if(!data){
+            return res.status(400).json({
+                message : 'invalid id',
+                success : false
             });
+        }
+        let chapterWiseProgress = [];
+        let totalCompletedSubtopics = 0;
+        for(let i = 0 ;i < data.length ;i++) {
+            totalCompletedSubtopics += data[i].subTopics.length;
+            let chapter = await Chapter.findOne({ _id : data[i].chapterId }, { 'totalSubTopics' : 1 });
+            console.log(chapter);
+            let obj = {};
+            obj['chapterId'] = data[i].chapterId;
+            obj['completedSubtopics'] = data[i].subTopics.length;
+            obj['totalSubtopics'] = chapter.totalSubTopics;
+            console.log(obj);
+            chapterWiseProgress.push(obj);
+        }
+        let courseProgress = {};
+        courseProgress['completedSubtopics'] = totalCompletedSubtopics;
+        courseProgress['totalSubtopics'] = course.totalSubTopics;
+        return res.status(200).json({
+            message : 'successfully fetched course progress',
+            data: { courseProgress, chapterWiseProgress },
+            success:true
+        });
         
     } catch (error) {
         console.log(error);
