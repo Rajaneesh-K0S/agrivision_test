@@ -194,7 +194,7 @@ module.exports.forgotPassword = async function (req, res) {
               </div>`,
             });
 
-            return res.send(200).json({
+            return res.status(200).json({
                 message: 'Please check your mail to reset password',
                 success: true
             });
