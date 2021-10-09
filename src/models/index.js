@@ -3,7 +3,7 @@ module.exports.User = require('./user');
 module.exports.Magazine = require('./magazine');
 module.exports.Article = require('./article');
 
-module.exports.QuizCollection = require('./quiz');
+
 
 
 let exportedCourseObject = require('./courses/course');
