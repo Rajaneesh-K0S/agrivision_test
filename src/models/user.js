@@ -1,6 +1,26 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const PaymentDetailsSchema = mongoose.Schema({
+    package_id:{
+        type:String 
+    },
+    order_id:{
+        type:String
+    },
+    payment_id:{
+        type:String
+    },
+    time:{
+        type:Date,
+        default:Date.now()
+    },
+    amount:{
+        type:String
+    }
+})
+
+
 const userSchema = new Schema({
     name: [{
         type: String,
