@@ -1,6 +1,26 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const PaymentDetailsSchema = mongoose.Schema({
+    package_id:{
+        type:String 
+    },
+    order_id:{
+        type:String
+    },
+    payment_id:{
+        type:String
+    },
+    time:{
+        type:Date,
+        default:Date.now()
+    },
+    amount:{
+        type:String
+    }
+});
+
+
 const userSchema = new Schema({
     name: [{
         type: String,
@@ -13,6 +33,18 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    contactNumber : {
+        type : Number
+    },
+    dob : {
+        type : Date
+    },
+    address : {
+        type : String
+    },
+    category : {
+        type : String
     },
     password: {
         type: String
@@ -75,6 +107,14 @@ const userSchema = new Schema({
     reminder:[{
         task:String,
         date:Date
+    }],
+    postedJobs : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Jobs'
+    }],
+    appliedJobs : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Jobs'
     }]
 });
 

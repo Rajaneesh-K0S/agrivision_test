@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
-const {google} = require('googleapis');
-const oAuth2Client = new google.auth.OAuth2(process.env.clientId,process.env.clientSecret,process.env.redirectURI);
-oAuth2Client.setCredentials({refresh_token:process.env.refreshToken})
+const { google } = require('googleapis');
+const oAuth2Client = new google.auth.OAuth2(process.env.clientId, process.env.clientSecret, process.env.redirectURI);
+oAuth2Client.setCredentials({ refresh_token:process.env.refreshToken });
 // const path = require('path');
 
 async function getAccessToken(){
@@ -19,6 +19,6 @@ const transporter = nodemailer.createTransport({
         refreshToken: process.env.refreshToken,
         accessToken: getAccessToken()
     }
-})
+});
 
 module.exports = transporter;

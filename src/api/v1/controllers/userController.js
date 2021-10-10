@@ -4,6 +4,26 @@ const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
 
 // const { boolean } = require('joi');
+module.exports.userProfile=async(req,res)=>{
+   try {
+       let user=await User.findById(req.user._id);
+       return res.status(200).json({
+           user:{
+               name:user.name,
+               email:user.email,
+               _id:user._id,
+               courses:user.courses
+           },
+           success:true
+       })
+   } catch (error) {
+    res.status(500).json({
+        message: 'something went wrong',
+        success: false,
+    });
+   }
+}
+
 
 module.exports.registerUser = async (req, res) => {
     try {
@@ -54,7 +74,6 @@ module.exports.registerUser = async (req, res) => {
             success: true,
         });
     } catch (err) {
-        console.log(err);
         res.status(500).json({
             message: 'something went wrong',
             success: false,
@@ -87,7 +106,12 @@ module.exports.login = async function (req, res) {
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user, token
+                user:{
+                    name:user.name,
+                    email:user.email,
+                    _id:user._id,
+                    courses:user.courses
+                }, token
             },
             success: true,
         });
@@ -145,7 +169,7 @@ module.exports.confirmEmail = async function (req, res) {
 module.exports.resetPassword = async function (req, res) {
 
     try {
-        let user = await User.findOne({ randString: req.params.secret });
+        let user = await User.findOne({ randString: req.query.forgot });
         if (!user) {
             return res.status(400).json({
                 message: 'Bad Request',
@@ -188,7 +212,7 @@ module.exports.forgotPassword = async function (req, res) {
                   <h2>Hello ${user.name}</h2>
                   <br>
                   <p>Kindly click on the link below to reset your password.</p>
-                  <a href='https://nifty-payne-c217e9.netlify.app?confirm=${confirmationCode}'> Click here</a>
+                  <a href='https://nifty-payne-c217e9.netlify.app/reset?forgot=${confirmationCode}'> Click here</a>
                   <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                   <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
               </div>`,
@@ -382,6 +406,45 @@ module.exports.getReminder = async function(req, res){
     } catch (error) {
         res.status(400).json({
             message : 'something went wrong',
+            success : false
+        });
+    }
+};
+
+
+module.exports.getProfile = async function (req, res){
+    try{
+        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 });
+        res.status(200).json({
+            data : user,
+            message : 'successfully fetched profile data',
+            success : true
+        });
+    }
+    catch(error){
+        res.status(400).json({
+            message : error.message,
+            success : false
+        });
+    }
+};
+
+
+module.exports.updateProfile = async function (req, res){
+    try{
+        let data = req.body;
+        if(req.file){
+            data['image'] = req.file.location;
+        }
+        await User.findByIdAndUpdate(req.user._id, data);
+        res.status(200).json({
+            message : 'Profile updated successfully',
+            success : true
+        });
+    }
+    catch(error){
+        res.status(400).json({
+            message : error.message,
             success : false
         });
     }

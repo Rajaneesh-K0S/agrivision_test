@@ -123,14 +123,25 @@ module.exports.subTopics = async (req, res) => {
         if (subTopic.contentType == 0) {
             let stringData = await mdToStringConverter(subTopic.content);
             res.status(200).json({
+                contentType: 0,
                 data: stringData,
                 message: 'pdf data fetched successfully.',
+                success: 'true'
+            });
+        }
+        else if (subTopic.contentType == 1) {
+            let videoData = subTopic.content;
+            res.status(200).json({
+                contentType:1,
+                data: videoData,
+                message: 'Quiz data fetched successfully.',
                 success: 'true'
             });
         }
         else if (subTopic.contentType == 2) {
             let quizData = subTopic.quiz;
             res.status(200).json({
+                contentType:2,
                 data: quizData,
                 message: 'Quiz data fetched successfully.',
                 success: 'true'
