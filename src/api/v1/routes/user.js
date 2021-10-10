@@ -3,7 +3,7 @@ const router = Router();
 const passport = require('passport');
 const { uploadImg } = require('../../../config/imageUpload');
 
-const { registerUser, login, googleOauth, confirmEmail, resetPassword, forgotPassword, getCart, deleteProductInCart, addToCart, getReminder, courseProgress, userProgress, markCompleted, addReminder,userProfile } = require('../controllers/userController');
+const { registerUser, login, googleOauth, confirmEmail, resetPassword, forgotPassword, getCart, deleteProductInCart, addToCart, getReminder, courseProgress, userProgress, markCompleted, addReminder,userProfile ,getProfile,updateProfile} = require('../controllers/userController');
 
 
 router.post('/register', registerUser);
