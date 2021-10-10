@@ -3,14 +3,14 @@ const app = express();
 const passport = require('passport');
 const logger = require('./logger');
 const cors = require('cors');
-//const streakCalculatorJob = require('./utils/scheduledJobs/streakCalculator');
+const streakCalculatorJob = require('./utils/scheduledJobs/streakCalculator');
 
 require('./config/mongoose');
 require('./config/auth/passport-google-token');
 require('./config/auth/passportJWT');
 
 
-//streakCalculatorJob.start();
+streakCalculatorJob.start();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
