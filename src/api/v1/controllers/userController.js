@@ -178,6 +178,7 @@ module.exports.resetPassword = async function (req, res) {
         } else {
             const hash = await bcrypt.hash(req.body.password, 10);
             user.password = hash;
+            user.randString = null;
             await user.save();
             return res.status(200).json({
                 message: 'Password updated.Please login using new password',
