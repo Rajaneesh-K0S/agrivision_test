@@ -20,3 +20,6 @@ module.exports.Event = require('./event');
 module.exports.Cart = require('./cart');
 
 
+module.exports.Jobs = require('./job');
+
+

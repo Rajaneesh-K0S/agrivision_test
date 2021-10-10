@@ -18,7 +18,7 @@ const PaymentDetailsSchema = mongoose.Schema({
     amount:{
         type:String
     }
-})
+});
 
 
 const userSchema = new Schema({
@@ -33,6 +33,18 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    contactNumber : {
+        type : Number
+    },
+    dob : {
+        type : Date
+    },
+    address : {
+        type : String
+    },
+    category : {
+        type : String
     },
     password: {
         type: String
@@ -95,6 +107,14 @@ const userSchema = new Schema({
     reminder:[{
         task:String,
         date:Date
+    }],
+    postedJobs : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Jobs'
+    }],
+    appliedJobs : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Jobs'
     }]
 });
 

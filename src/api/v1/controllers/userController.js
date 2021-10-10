@@ -145,7 +145,7 @@ module.exports.confirmEmail = async function (req, res) {
 module.exports.resetPassword = async function (req, res) {
 
     try {
-        let user = await User.findOne({ randString: req.query.forgot});
+        let user = await User.findOne({ randString: req.query.forgot });
         if (!user) {
             return res.status(400).json({
                 message: 'Bad Request',
@@ -382,6 +382,45 @@ module.exports.getReminder = async function(req, res){
     } catch (error) {
         res.status(400).json({
             message : 'something went wrong',
+            success : false
+        });
+    }
+};
+
+
+module.exports.getProfile = async function (req, res){
+    try{
+        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 });
+        res.status(200).json({
+            data : user,
+            message : 'successfully fetched profile data',
+            success : true
+        });
+    }
+    catch(error){
+        res.status(400).json({
+            message : error.message,
+            success : false
+        });
+    }
+};
+
+
+module.exports.updateProfile = async function (req, res){
+    try{
+        let data = req.body;
+        if(req.file){
+            data['image'] = req.file.location;
+        }
+        await User.findByIdAndUpdate(req.user._id, data);
+        res.status(200).json({
+            message : 'Profile updated successfully',
+            success : true
+        });
+    }
+    catch(error){
+        res.status(400).json({
+            message : error.message,
             success : false
         });
     }
