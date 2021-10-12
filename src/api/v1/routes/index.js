@@ -16,6 +16,7 @@ router.use('/payment', require('./payment'));
 
 
 router.use('/magazine', passport.authenticate('jwt', { session:false }), require('./magazine'));
+router.use('/academics', require('./academics'));
 
 router.get('/', (req, res) => {
     logger.debug('GET /v1');
