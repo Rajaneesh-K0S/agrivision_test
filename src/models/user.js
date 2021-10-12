@@ -77,10 +77,12 @@ const userSchema = new Schema({
     },
     readingDuration:[{
         date:{
-            type:String
+            type:String,
+            default:Date.now
         },
         duration:{
-            type:Number
+            type:Number,
+            default:0
         }
     }],
     testDuration:[{
@@ -99,23 +101,31 @@ const userSchema = new Schema({
         type:Number,
         default:60
     },
-    currentStreakDay:Number,
-    longestStreakDay:Number,
-    testsCompleted:Number,
-    coursesCompleted:Number,
-    totalTimeSpent:Number,
+    currentStreakDay:{
+        type:Number,
+        defaut:0
+    },
+    longestStreakDay:{
+        type:Number,
+        defaut:0
+    },
+    testsCompleted:{
+        type:Number,
+        defaut:0
+    },
+    coursesCompleted:{
+        type:Number,
+        defaut:0
+    },
+    totalTimeSpent:{
+        type:Number,
+        defaut:0
+    },
     reminder:[{
         task:String,
         date:Date
     }],
-    postedJobs : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Jobs'
-    }],
-    appliedJobs : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Jobs'
-    }]
+    
 });
 
 const User = mongoose.model('User', userSchema);
