@@ -15,7 +15,7 @@ const collegeSchema = new Schema({
         type:String
     }],
     courseFees: String,
-    courseFeesNumber: Number,
+    courseFeesCategory: Number,
     Duration:String,
     salaryOffered:String,
     opportunities:String,
