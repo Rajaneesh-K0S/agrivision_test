@@ -125,6 +125,16 @@ const userSchema = new Schema({
         task:String,
         date:Date
     }],
+    cart:{
+        testSeries : [{
+            type : mongoose.Schema.Types.ObjectId,
+            
+        }],
+        courses : [{
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'Course'
+        }],
+    }
     
 });
 
