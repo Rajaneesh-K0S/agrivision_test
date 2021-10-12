@@ -1,6 +1,6 @@
  const CronJob = require('cron').CronJob;
  const { User } = require('../../models');
- var job = new CronJob('1 * * * * *', async function() {
+ var job = new CronJob('* 1 0 * * *', async function() {
      const user =await User.find({});
      let date = new Date();
      date.setDate(date.getDate() - 1);
