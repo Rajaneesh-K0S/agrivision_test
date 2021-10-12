@@ -22,4 +22,4 @@ module.exports.Cart = require('./cart');
 
 module.exports.Jobs = require('./job');
 
-
+module.exports.College = require('./academic')
