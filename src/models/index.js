@@ -17,7 +17,6 @@ module.exports.SubTopic = require('./courses/subtopic');
 module.exports.Event = require('./event');
 
 
-module.exports.Cart = require('./cart');
 
 
 module.exports.Jobs = require('./job');

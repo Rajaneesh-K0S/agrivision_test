@@ -1,4 +1,4 @@
-const { User, Cart, SubTopic } = require('../../../models');
+const { User,  SubTopic } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
@@ -265,19 +265,23 @@ module.exports.addReminder = async function(req, res){
 module.exports.addToCart = async(req, res)=>{
 
     let userId = req.params.id;
-    let courseId = req.query.courseId;
-    let testSeriesId = req.query.testSeriesId;
+    let courseId = req.body.courseId;
+    let testSeriesId = req.body.testSeriesId;
     try{
-         
+        //let user = await User.findById(userId);
         if(courseId){
-            await Cart.updateOne({ user : userId }, { '$push' : { 'courses' : courseId } });
+            // user.cart.courses.push(courseId);
+            // await user.save();
+            await User.updateOne({ _id : userId }, { '$push' :  { 'cart.courses' : courseId   }});
             res.status(300).json({
                 message : 'successfully added course in cart',
                 success : true
             });
         }
         else if(testSeriesId){
-            await Cart.updateOne({ user : userId }, { '$push' : { 'testSeries' : testSeriesId } });
+            user.cart.testSeries.push(courseId);
+            await user.save();
+            await User.updateOne({ _id : userId }, { '$push' : { 'cart.testSeries' : testSeriesId } });
             res.status(300).json({
                 message : 'successfully added testSeries in cart',
                 success : true
@@ -297,7 +301,8 @@ module.exports.addToCart = async(req, res)=>{
 module.exports.getCart = async (req, res)=>{
     let userId = req.params.id;
     try{
-        let cart = await Cart.findOne({ user : userId }).populate([{ path : 'testSeries', select : 'name description price smallImage' }, { path : 'courses', select : 'name description price smallImage' }]);
+        let user = await User.findById(userId);
+        let cart = user.cart;
         let testSeriesItems = [];
         let courseItems = [];
         let totalAmount = 0;
@@ -332,7 +337,7 @@ module.exports.getCart = async (req, res)=>{
     }
     catch(error){
         res.status(400).json({
-            message : 'something went wrong',
+            message : error.message,
             success : false
         });
     }
@@ -341,18 +346,19 @@ module.exports.getCart = async (req, res)=>{
 
 module.exports.deleteProductInCart = async function (req, res) {
     let userId = req.params.id;
-    let courseId = req.query.courseId;
-    let testSeriesId = req.query.testSeriesId;
+    let courseId = req.body.courseId;
+    let testSeriesId = req.body.testSeriesId;
     try{
+        
         if(courseId){
-            await Cart.updateOne({ user : userId }, { '$pull' : { 'courses' : courseId } });
+            await User.updateOne({ _id : userId }, { '$pull' :  { 'cart.courses' : courseId   }});
             res.status(300).json({
                 message : 'deleted successfully',
                 success : true
             });
         }
         else if(testSeriesId){
-            await Cart.updateOne({ user : userId }, { '$pull' : { 'testSeries' : testSeriesId } });
+            await User.updateOne({ _id : userId },{ '$pull' :  { 'cart.testSeries' : courseId   }});
             res.status(300).json({
                 message : 'deleted successfully',
                 success : true
@@ -361,6 +367,7 @@ module.exports.deleteProductInCart = async function (req, res) {
     }
     catch(error){
         res.status(400).json({
+            error : error.message,
             message : 'something went wrong',
             success : false
         });
