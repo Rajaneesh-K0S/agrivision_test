@@ -75,6 +75,7 @@ module.exports.registerUser = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
+            error: err.message,
             message: 'something went wrong',
             success: false,
         });
@@ -301,8 +302,8 @@ module.exports.addToCart = async(req, res)=>{
 module.exports.getCart = async (req, res)=>{
     let userId = req.params.id;
     try{
-        let user = await User.findById(userId);
-        let cart = user.cart;
+        let user = await User.findById(userId).populate({path: 'cart',populate:{path:'courses'}});
+        let cart = user.cart
         let testSeriesItems = [];
         let courseItems = [];
         let totalAmount = 0;

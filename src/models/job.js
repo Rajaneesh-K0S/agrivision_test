@@ -5,7 +5,7 @@ let Schema =  mongoose.Schema;
 
 let jobSchema = new Schema({
     title : String,
-    type : Number,          // 0 for jobs, 1 for internships, 2 for scholarships
+    jobType : Number,          // 0 for jobs, 1 for internships, 2 for scholarships
     organisation : String,
     location : String,
     stipend : Number,      // in INR per month
