@@ -4,25 +4,25 @@ const { randString, generateToken } = require('../../../utils');
 const transporter = require('../../../config/nodemailer');
 
 // const { boolean } = require('joi');
-module.exports.userProfile=async(req,res)=>{
-   try {
-       let user=await User.findById(req.user._id);
-       return res.status(200).json({
-           user:{
-               name:user.name,
-               email:user.email,
-               _id:user._id,
-               courses:user.courses
-           },
-           success:true
-       })
-   } catch (error) {
-    res.status(500).json({
-        message: 'something went wrong',
-        success: false,
-    });
-   }
-}
+// module.exports.userProfile=async(req,res)=>{
+//    try {
+//        let user=await User.findById(req.user._id);
+//        return res.status(200).json({
+//            user:{
+//                name:user.name,
+//                email:user.email,
+//                _id:user._id,
+//                courses:user.courses
+//            },
+//            success:true
+//        })
+//    } catch (error) {
+//     res.status(500).json({
+//         message: 'something went wrong',
+//         success: false,
+//     });
+//    }
+// }
 
 
 module.exports.registerUser = async (req, res) => {
