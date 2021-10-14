@@ -134,7 +134,18 @@ const userSchema = new Schema({
             type : mongoose.Schema.Types.ObjectId,
             ref : 'Course'
         }]
-    }
+    },
+    testSeries : [{
+        type : Schema.Types.ObjectId,
+        ref : 'TestSeries'
+    }],
+    testSeriesProgress:[{
+        testSeriesId:Schema.Types.ObjectId,
+        quizzes:[{
+            type:Schema.Types.ObjectId,
+            unique:true
+        }]
+    }]
     
 });
 
