@@ -12,6 +12,13 @@ const quizTableSchema = new Schema({
         type:String
     }],
     quizType: Number, //[0-General,1-Test Series,2-Course]
+    sections:[{
+        name:String,
+        questions : [{
+            type : Schema.Types.ObjectId,
+            ref : "Question"
+        }]
+    }],
     totalNoQuestions : Number,
     exam: String,
     subject:String,

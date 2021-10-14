@@ -27,3 +27,5 @@ module.exports.College = require('./academic');
 module.exports.TestSeries = require('./testSeries');
 
 module.exports.Quiz = require('./quiz/quiz');
+module.exports.Question = require('./quiz/question');
+module.exports.Rank = require('./quiz/rank')

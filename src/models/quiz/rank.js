@@ -5,7 +5,9 @@ const rank = new Schema({
     userId:{
         type: Schema.Types.ObjectId,          // change it to object id 
     },
-    userName: String,
+    userName: [{
+        type:String
+    }],
     quizId:{
         type:Schema.Types.ObjectId,
         ref:'Quiz'
@@ -16,21 +18,38 @@ const rank = new Schema({
             Number
         ]
     },
-    totalCorrect: Number,
-    totalIncorrect: Number,
-    unattempted: Number,
-    positiveMarks:Number,
-    totalScore: Number,
-    totalTime: Number,
+    totalCorrect: {
+        type:Number,
+        default:0
+    },
+    totalIncorrect: {
+        type:Number,
+        default:0
+    },
+    unattempted: {
+        type:Number
+    },
+    positiveMarks:{
+        type:Number,
+        default:0
+    },
+    totalScore: {
+        type:Number,
+        default:0
+    },
+    totalTime: {
+        type:Number,
+        default:0
+    },
     chapters:{
         type:Map,
         of:Object
     },
-    topics:{
-        type:Map,
-        of:Object
-    },
-    totalMarks:Number
+    totalMarks:{
+        type:Number,
+        default:0
+    }
 });
 
 const Rank = mongoose.model('Rank', rank);
+module.exports = Rank;
