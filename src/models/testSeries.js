@@ -11,6 +11,7 @@ let testSeriesSchema = new Schema({
     subject : String,
     rating : Number,
     description : String,
+    userEnrolled : Number,
     quizzes : [{
         type : Schema.Types.ObjectId,
         ref : 'Quiz'
@@ -21,9 +22,16 @@ let testSeriesSchema = new Schema({
     feedbacks:[{
         type : Schema.Types.ObjectId,
         ref : 'Review'
+    }],
+    similarTestSeries : [{
+        type : Schema.Types.ObjectId,
+        ref : 'TestSeries'
+
     }]
 })
 
 let TestSeries = mongoose.model('TestSeries', testSeriesSchema);
 
-module.exports = {TestSeries};
+
+module.exports = TestSeries;
+

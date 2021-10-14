@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const developmentLogger = require('./developmentLogger');
 const productionLogger = require('./productionLogger');
 

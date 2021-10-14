@@ -21,4 +21,9 @@ module.exports.Event = require('./event');
 
 module.exports.Jobs = require('./job');
 
-module.exports.College = require('./academic')
+module.exports.College = require('./academic');
+
+
+module.exports.TestSeries = require('./testSeries');
+
+module.exports.Quiz = require('./quiz/quiz');

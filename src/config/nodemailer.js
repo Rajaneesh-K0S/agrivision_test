@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const oAuth2Client = new google.auth.OAuth2(process.env.clientId, process.env.clientSecret, process.env.redirectURI);

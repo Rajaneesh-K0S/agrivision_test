@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const passport = require('passport');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 

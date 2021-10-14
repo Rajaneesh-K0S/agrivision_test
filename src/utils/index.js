@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports.randString = () => {
     let pass = '';
     let str = 'PQRSTUVWXIJKLMNO' +

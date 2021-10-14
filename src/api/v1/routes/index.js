@@ -10,6 +10,7 @@ router.use('/user', require('./user'));
 router.use('/quiz', require('./quiz'));
 router.use('/course', require('./course'));
 router.use('/jobs',  require('./job'));
+router.use('/testseries', require('./testSeries'));
 
 router.use('/payment', require('./payment'));
 
