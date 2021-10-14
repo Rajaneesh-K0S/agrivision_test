@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const questionSchema = new Schema({
-    quizId:{
-        type:Schema.Types.ObjectId,
-        ref:'Quiz'
-    },
     question: {
         type: String
     },
@@ -20,10 +16,9 @@ const questionSchema = new Schema({
     negMarking:Number,
     options:[{
         type: String,
-        isImage: {
-            type: Boolean,
-            default: false
-        }
+    }],
+    optionsImage:[{
+        type: String,
     }],
     correctAnswer: [{
         type: Number //1,2,3,4
@@ -32,19 +27,11 @@ const questionSchema = new Schema({
         type:String
     },
     explanationImage: {
-        data: Buffer,
-        contentType: String
-    },
-    section:{
-        type: String
+        type:String
     },
     chapterId: {
         type: Schema.Types.ObjectId,
         ref: 'Chapter', 
-    },
-    topicId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Topic'
     }
 });
 
