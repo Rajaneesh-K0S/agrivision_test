@@ -25,5 +25,11 @@ router.get('/', (req, res) => {
         message: 'Hello Agrivision!',
     });
 });
+router.get('*', (req, res) => {
+    res.status(404).json({
+        message: 'Page Not Found',
+        success:false
+    });
+});
 
 module.exports = router;
