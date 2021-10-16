@@ -214,7 +214,7 @@ module.exports.forgotPassword = async function (req, res) {
                   <h2>Hello ${user.name}</h2>
                   <br>
                   <p>Kindly click on the link below to reset your password.</p>
-                  <a href='https://agrivision4u.com?forgot=${confirmationCode}'> Click here</a>
+                  <a href='https://www.agrivision4u.com?forgot=${confirmationCode}'> Click here</a>
                   <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                   <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
               </div>`,
