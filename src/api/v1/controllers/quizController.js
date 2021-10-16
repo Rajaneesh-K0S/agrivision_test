@@ -28,12 +28,7 @@ module.exports.startQuiz = async (req, res) => {
                 success:false
             })
         }
-        if(!quiz.registeredUsers.includes(req.user._id)){
-            return res.status(400).json({
-                message:'You are not registered for this Quiz',
-                success: false
-            })
-        }
+   
         let rank =  await Rank.findOne({userId:req.user._id,quizId:id});
         if(!rank){
             rank = new Rank({quizId:id,userId:req.user._id,userName:req.user.name,unattempted:quiz.totalNoQuestions,markedAns:{}});
