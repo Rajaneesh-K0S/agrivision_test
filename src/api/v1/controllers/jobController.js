@@ -5,13 +5,13 @@ module.exports.getJobs = async (req, res) => {
     try{
         let jobs = await Jobs.find({});
         if(req.query.job=='jobs'){
-            jobs = await Jobs.find({type:0})
+            jobs = await Jobs.find({jobType:0})
         }
         else if(req.query.job=='internships'){
-            jobs = await Jobs.find({type:1})
+            jobs = await Jobs.find({jobType:1})
         }
         else if(req.query.job=='scholarships'){
-            jobs = await Jobs.find({type:2})
+            jobs = await Jobs.find({jobType:2})
         }
         
         res.status(200).json({
