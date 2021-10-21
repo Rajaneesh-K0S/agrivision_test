@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 let multer = require('multer');
 let multerS3 = require('multer-s3');
 let aws = require('aws-sdk');
