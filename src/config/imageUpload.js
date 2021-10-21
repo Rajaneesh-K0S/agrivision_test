@@ -14,7 +14,7 @@ let S3 = new aws.S3();
 let uploadImg = multer({
     storage: multerS3({
         s3: S3,
-        bucket: 'agrivision4u',
+        bucket: process.env.bucketName,
         acl : 'public-read',
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname });
