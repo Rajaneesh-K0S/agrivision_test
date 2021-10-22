@@ -145,10 +145,10 @@ module.exports.confirmEmail = async function (req, res) {
 
             return res.status(200).json({
                 message: 'Email verified. Welcome to AgriVision4u',
+                success: true,
                 data: {
                     user: user,
-                    token: token,
-                    success: true
+                    token: token
                 }
             });
 
