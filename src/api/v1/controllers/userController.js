@@ -85,7 +85,7 @@ module.exports.registerUser = async (req, res) => {
 module.exports.login = async function (req, res) {
 
     try {
-        let user = await User.findOne({ email: req.body.email });
+        let user = await User.findOne({ email: req.body.email }).populate('courses');
 
         if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
             return res.status(400).json({
@@ -126,7 +126,7 @@ module.exports.login = async function (req, res) {
 };
 
 module.exports.googleOauth = async function (req, res) {
-    const user = await User.findOne({ email: req.user.email });
+    const user = await User.findOne({ email: req.user.email }).populate('courses');
     const token = generateToken(user);
     return res.status(200).send({ token, user });
 };
