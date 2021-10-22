@@ -28,7 +28,7 @@ const transporter = require('../../../config/nodemailer');
 module.exports.registerUser = async (req, res) => {
     try {
 
-        let user = await User.findOne({ email: req.body.email });
+        let user = await User.findOne({ email: req.body.email }).populate('courses');
 
         if (user) {
             return res.status(400).json({
@@ -38,7 +38,7 @@ module.exports.registerUser = async (req, res) => {
         }
         let confirmationCode = randString();
         await transporter.sendMail({
-            from: 'AgriVision4U <sprajapati14012002@gmail.com>',
+            from: 'AgriVision4U <agrivision4u.official@gmail.com>',
             to: req.body.email,
             subject: 'Please confirm your Email',
             html: `<h1>Email Confirmation</h1>
@@ -61,7 +61,7 @@ module.exports.registerUser = async (req, res) => {
             randString: confirmationCode
         });
 
-        let token = generateToken(user);
+        
 
         await user.save();
 
@@ -69,7 +69,6 @@ module.exports.registerUser = async (req, res) => {
             message: 'Please verify your email to login',
             data: {
                 user: user,
-                token: token,
             },
             success: true,
         });
@@ -207,7 +206,7 @@ module.exports.forgotPassword = async function (req, res) {
             user.randString = confirmationCode;
             await user.save();
             transporter.sendMail({
-                from: 'AgriVision4U <sprajapati14012002@gmail.com>',
+                from: 'AgriVision4U <agrivision4u.official@gmail.com>',
                 to: req.body.email,
                 subject: 'Reset Password',
                 html: `<h1>Reset Password</h1>
@@ -423,7 +422,7 @@ module.exports.getReminder = async function(req, res){
 
 module.exports.getProfile = async function (req, res){
     try{
-        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 });
+        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1,courses:1 });
         res.status(200).json({
             data : user,
             message : 'successfully fetched profile data',

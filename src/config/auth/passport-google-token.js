@@ -6,8 +6,8 @@ const GoogleTokenStrategy = require('passport-google-token').Strategy;
 const { User } = require('../../models');
 
 passport.use(new GoogleTokenStrategy({
-    clientID: process.env.GOOGLEAUTH_CLIENTID,
-    clientSecret: process.env.GOOGLEAUTH_CLIENTSECRET,
+    clientID: process.env.prod_GOOGLEAUTH_CLIENTID,
+    clientSecret: process.env.prod_GOOGLEAUTH_CLIENTSECRET,
 }, async function (accessToken, refreshToken, profile, done) {
     try {
         let user = await User.findOne({ email: profile._json.email });

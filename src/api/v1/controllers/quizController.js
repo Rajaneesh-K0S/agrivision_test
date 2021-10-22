@@ -93,3 +93,27 @@ module.exports.clearAnswer = async(req,res) =>{
         });
     }  
 }
+
+module.exports.submitQuiz = async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const userId = req.user._id
+        const quiz = await Quiz.findById(id);
+        const startTime = quiz.startTime;
+        const finishedTime =Math.min(new Date().getTime(),quiz.endTime) ;
+        const totalTime = finishedTime - startTime;
+        const rank = await Rank.findOneAndUpdate({userId:userId,quizId:id},{isSubmitted:true,totalTime:totalTime});
+        res.status(200).json({
+            message:'succesfully submitted the quiz',
+            success:true
+        });
+
+    }
+    catch(err){
+
+    }
+    
+
+
+
+}

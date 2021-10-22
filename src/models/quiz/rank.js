@@ -12,6 +12,10 @@ const rank = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Quiz'
     },
+    isSubmitted:{
+        type:Boolean,
+        default:false
+    },
     markedAns:{ 
         type: Map,
         of: [

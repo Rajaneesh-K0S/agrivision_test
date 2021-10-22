@@ -2,8 +2,8 @@ require("dotenv").config();
 
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const oAuth2Client = new google.auth.OAuth2(process.env.clientId, process.env.clientSecret, process.env.redirectURI);
-oAuth2Client.setCredentials({ refresh_token:process.env.refreshToken });
+const oAuth2Client = new google.auth.OAuth2(process.env.prod_clientId, process.env.prod_clientSecret, process.env.redirectURI);
+oAuth2Client.setCredentials({ refresh_token:process.env.prod_refreshToken });
 // const path = require('path');
 
 async function getAccessToken(){
@@ -15,10 +15,10 @@ const transporter = nodemailer.createTransport({
     service:'gmail',
     auth: {
         type:'OAuth2',
-        user:'sprajapati14012002@gmail.com',
-        clientId: process.env.clientId,
-        clientSecret: process.env.clientSecret,
-        refreshToken: process.env.refreshToken,
+        user:'agrivision4u.official@gmail.com',
+        clientId: process.env.prod_clientId,
+        clientSecret: process.env.prod_clientSecret,
+        refreshToken: process.env.prod_refreshToken,
         accessToken: getAccessToken()
     }
 });
