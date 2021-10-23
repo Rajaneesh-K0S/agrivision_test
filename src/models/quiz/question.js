@@ -29,9 +29,10 @@ const questionSchema = new Schema({
     explanationImage: {
         type:String
     },
-    chapterId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Chapter', 
+    topic : String,
+    quizId : {
+        type : Schema.Types.ObjectId,
+        ref : 'Quiz'
     }
 });
 

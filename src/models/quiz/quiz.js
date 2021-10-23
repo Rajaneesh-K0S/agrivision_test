@@ -20,6 +20,7 @@ const quizTableSchema = new Schema({
         }]
     }],
     totalNoQuestions : Number,
+    maxScore : Number,
     exam: String,
     subject:String,
     calculator : Boolean,
