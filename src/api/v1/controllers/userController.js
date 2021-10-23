@@ -423,7 +423,7 @@ module.exports.getReminder = async function(req, res){
 
 module.exports.getProfile = async function (req, res){
     try{
-        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 });
+        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 ,courses:1});
         res.status(200).json({
             data : user,
             message : 'successfully fetched profile data',
