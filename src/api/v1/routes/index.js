@@ -13,7 +13,7 @@ router.use('/jobs',  require('./job'));
 router.use('/testseries', require('./testSeries'));
 
 router.use('/payment', require('./payment'));
-
+router.use('/article',require('./article'));
 
 
 router.use('/magazine', passport.authenticate('jwt', { session:false }), require('./magazine'));
