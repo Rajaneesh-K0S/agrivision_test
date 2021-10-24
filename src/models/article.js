@@ -3,24 +3,59 @@ const mongoose = require('mongoose');
 // const path = require('path');
 //const ARTICLE_PATH = path.join('/uploads/articles');
 
-const articleSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+const contentSchema=new mongoose.Schema({
+    paragraph:{
+        type:String
     },
-    title: {
+    image:{
+        type:String
+    }
+})
+
+
+const articleCommentsSchema = new Schema({
+    comment:{
+        type:String
+    },
+    user:{
+        type:String
+    }
+}, {timeStamps : true});
+
+const articleSchema = new mongoose.Schema({
+    author: {   
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User' 
+        }
+    ,
+    type:{
+        type:String
+    },
+    likes:{
+        type:Number
+    },
+    viwes:{
+        type:Number
+    },
+    heading: {
         type: String,
     },
-    editor_pick: {
-        type: Boolean,
-        default: false
-    },
-    path: {
+    description: {
         type: String
-    }
+    },
+    mainImage:{
+        type:String
+    },
+    highlights:[{
+        type:String
+    }],
+    content:[contentSchema],
+    comments:[articleCommentsSchema]
+
 }, {
     timestamps: true
 });
+
 
 
 // let storage = multer.diskStorage({
