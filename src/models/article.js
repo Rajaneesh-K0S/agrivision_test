@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {Schema} =mongoose;
 //const multer = require('multer');
 // const path = require('path');
 //const ARTICLE_PATH = path.join('/uploads/articles');
