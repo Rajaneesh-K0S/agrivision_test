@@ -172,13 +172,15 @@ let smallAnalysisByTopic = (analysisByTopic) => {
 module.exports.getAnalysis = async (req, res) => {
     let quizId = req.params.id;
     let userId = req.user._id;
+    // let userId = '616a40b67a5512001682343c';
     // 0 for overview, 1 for solution, 2 for weakness, 3 for comprasion 
     try {
         if (req.query.queryParam == 0) {
             let rank = await Rank.findOne({ userId, quizId });
-            let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, totalTime: 1 }).sort({ totalScore: -1, totalTime: 1 });
+            let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
             let quizData = await Quiz.findOne({ _id: quizId }, { name: 1, maxScore: 1, totalNoQuestions: 1, totalTime: 1, chapters: 1 });
             if(rank){
+                let quizName = quizData.name;
                 let obtainedMarks = rank.totalScore;
                 let maxMarks = quizData.maxScore;
                 let totalQuestions = quizData.totalNoQuestions;
@@ -197,7 +199,7 @@ module.exports.getAnalysis = async (req, res) => {
         
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: {quizName, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })                              
             }              
@@ -222,9 +224,11 @@ module.exports.getAnalysis = async (req, res) => {
                             let correctAnsString = question.correctAnswer.sort().join(',');
                             if (markedAnsString == correctAnsString) {
                                 quiz.sections[i].questions[j]['status'] = 1;
+                                quiz.sections[i].questions[j]['optionsSelected'] = markedAnsArray;
                             }
                             else {
                                 quiz.sections[i].questions[j]['status'] = -1;
+                                quiz.sections[i].questions[j]['optionsSelected'] = markedAnsArray;
                             }
                         } else {
                             quiz.sections[i].questions[j]['status'] = 0;
@@ -266,7 +270,7 @@ module.exports.getAnalysis = async (req, res) => {
             try{
                 let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
                 let userMarkedAnswers = markedAnswers;
-                let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1 }).sort({ totalScore: -1, totalTime: 1 });
+                let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
                 let topperMarked = await Rank.findOne({ quizId }, { markedAns: 1 }).sort({ totalScore: -1, totalTime: 1 }).limit(0);
                 let topperMarkedAnswers = topperMarked.markedAns;
                 let userAnalysisByTopic = await findAnalysisByTopic(userMarkedAnswers, allQuestions);
