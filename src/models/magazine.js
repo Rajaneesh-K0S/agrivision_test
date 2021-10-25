@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const magazineSchema = new mongoose.Schema({
     url:{
         type:String
+    },
+    type:{
+        type:String
     }
 }, {
     timestamps: true

@@ -1,16 +1,21 @@
-const { Article } = require('../../../models/index');
+const { Article,User } = require('../../../models/index');
 
 
 module.exports.allArticle = async function (req, res) {
     try {
-        let article = await Article.find({});
+      let articles=[];
+      if(!req.query){
+        articles = await Article.find({}).sort({'updatedAt': -1});
+      }else if(req.query.type){
+        articles = await Article.find({type:req.query.type}).sort({'updatedAt': -1});
+      }
         res.status(200).json({
-            message: 'all magazine fetched',
-            data: article,
+            message: 'articles fetched',
+            data: articles,
             success: true
         });
     } catch (error) {
-        res.status(400).json({
+        res.status(400).json({  
             message: error,
             success: false
         });
@@ -19,7 +24,9 @@ module.exports.allArticle = async function (req, res) {
 };
 module.exports.specificArticle = async function (req, res) {
     try {
-        let article = await Article.findOne({ _id: req.params.id });
+          article = await Article.findOne({ _id: req.params.id });
+          article.views++;
+          await article.save();
         res.status(200).json({
             data: article,
             message: 'article fetched',
@@ -33,6 +40,48 @@ module.exports.specificArticle = async function (req, res) {
     }
 
 };
+
+module.exports.addComment=async function(req,res){
+  try {
+    const article=await Article.findById(req.params.id);
+    const comment={
+      comment:req.body.comment,
+      user:req.user.name
+    };
+    article.comments.push(comment);
+    await article.save();
+    res.status(200).json({
+      data: comment,
+      message: 'comment added',
+      success: true
+  });
+  } catch (error) {
+    res.status(400).json({
+      message: error,
+      success: false
+     });
+  }
+}
+
+module.exports.addLike=async function(req,res){
+  try {
+    const article=await Article.findById(req.params.id);
+    article.likes++;
+    await article.save();
+    res.status(200).json({
+      data:{
+        likes:article.likes
+      },
+      message: 'comment added',
+      success: true
+  });
+  } catch (error) {
+    res.status(400).json({
+      message: error,
+      success: false
+     });
+  }
+}
 
 /* module.exports.articleSubmit = function (req, res) {
 
