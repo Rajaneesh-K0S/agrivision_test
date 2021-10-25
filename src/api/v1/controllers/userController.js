@@ -81,6 +81,59 @@ module.exports.registerUser = async (req, res) => {
     }
 };
 
+module.exports.resendMail = async(req,res)=>{
+    try
+    {
+        const {email} = req.query;
+        let user = await User.findOne({email:email});
+        if(user){
+            if(!user.isVerified){
+                user.randString = randString();
+                await user.save();
+                await transporter.sendMail({
+                    from: 'AgriVision4U <agrivision4u.official@gmail.com>',
+                    to: email,
+                    subject: 'Please confirm your Email',
+                    html: `<h1>Email Confirmation</h1>
+                              <h2>Hello ${user.name[0]}  ${user.name[1]}</h2>
+                              <br>
+                              <h3>We welcome you as a part of our <b>AgriVision4U</b> family.</h3>
+                              <p>Kindly click on the link below to confirm your e-mail address.</p>
+                              <a href='https://www.agrivision4u.com?confirm=${user.randString}'><h3> Click here</h3></a>
+                              <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
+                              <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
+                              </div>`,
+                });
+                return res.status(200).json({
+                    success:true,
+                    message:'mail resent sucessfully'
+                })
+            }
+            else{
+                return res.status(400).json({
+                    success:false,
+                    message:'user is already verified'
+                })
+            }
+            
+        }else{
+            return res.status(400).json({
+                success:false,
+                message:'create account first'
+            })
+        }
+    }
+    catch(error)
+    {
+        return res.status(500).json({
+            success:false,
+            message:'something went wrong',
+            error:error.message
+        })
+
+    }
+}
+
 module.exports.login = async function (req, res) {
 
     try {
