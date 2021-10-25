@@ -1,9 +1,10 @@
+require('dotenv').config();
 let multer = require('multer');
 let multerS3 = require('multer-s3');
 let aws = require('aws-sdk');
 
 aws.config.update({
-    accessKeyId :  process.env.awsAccessKeyId,
+    accessKeyId : process.env.awsAccessKeyId,
     secretAccessKey : process.env.awsSecretAccessKey
 });
 

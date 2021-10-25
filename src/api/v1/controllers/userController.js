@@ -147,8 +147,7 @@ module.exports.confirmEmail = async function (req, res) {
                 success: true,
                 data: {
                     user: user,
-                    token: token,
-                   
+                    token: token
                 }
             });
 
@@ -214,7 +213,7 @@ module.exports.forgotPassword = async function (req, res) {
                   <h2>Hello ${user.name}</h2>
                   <br>
                   <p>Kindly click on the link below to reset your password.</p>
-                  <a href='https://www.agrivision4u.com?forgot=${confirmationCode}'> Click here</a>
+                  <a href='https://www.agrivision4u.com/reset?forgot=${confirmationCode}'> Click here</a>
                   <p style = "color : rbg(150, 148, 137)">Please do not reply to this e-mail. This address is automated and cannot help with questions or requests.</p>
                   <h4>If you have questions please write to info@agrivision4u.com. You may also call us at <a href="tel:7510545225">7510545225</a></h4>
               </div>`,
@@ -423,7 +422,7 @@ module.exports.getReminder = async function(req, res){
 
 module.exports.getProfile = async function (req, res){
     try{
-        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1,courses:1 });
+        let user = await User.findOne({ _id : req.user._id }, { name : 1, email : 1, image : 1, contactNumber : 1, dob : 1, address : 1, category : 1 ,courses:1});
         res.status(200).json({
             data : user,
             message : 'successfully fetched profile data',
