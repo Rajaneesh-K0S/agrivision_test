@@ -48,10 +48,6 @@ const rank = new Schema({
     chapters:{
         type:Map,
         of:Object
-    },
-    totalMarks:{
-        type:Number,
-        default:0
     }
 });
 
