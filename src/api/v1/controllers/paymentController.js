@@ -6,6 +6,10 @@ const { User } = require('../../../models');
 
 
 module.exports.order = async (req, res) => {
+    let {courseIds, testSeriesIds, origin} = req.body;
+    let courseIdString = courseIds.join('$');
+    let testSeriesIdString = testSeriesIds.join('$');
+
     try {
         const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
@@ -16,6 +20,11 @@ module.exports.order = async (req, res) => {
             amount: req.params.amount * 100,
             currency: 'INR',
             receipt: 'receipt_order_',
+            notes: {
+                "courseId": courseIdString,
+                "testSeriesId": testSeriesIdString,
+                "origin": origin    // 0 for buy now, 1 for checkout
+              }
         };
 
         const order = await instance.orders.create(options);
@@ -53,18 +62,27 @@ module.exports.success = async (req, res) => {
         if (digest !== razorpaySignature)
             return res.status(400).json({ msg: 'Transaction not legit!' });
 
-        let user = await User.findOne({ email:req.body.payload.payment.entity.email });
-        await user.courses.push(req.body.payload.payment.entity.description);
+        console.log(req.body.payload.payment);    
 
+        let userEmail = req.body.payload.payment.entity.email;
+        let courseIdString = req.body.payload.payment.entity.courseId;
+        let testSeriesIdString = req.body.payload.payment.entity.testSeriesId;
+        let origin = req.body.payload.payment.entity.origin;
+        let courseIds = courseIdString.split('$');
+        let testSeriesIds = testSeriesIdString.split('$');
+        await User.updateOne({email : userEmail}, {'$push' : {courses : {'$each' :courseIds}, testSeries : {'$each' : testSeriesIds}}});
+        if(origin == 1){
+            await User.updateOne({email : userEmail}, {'$pull' : {'cart.courses' : {'$each' : courseIds}, 'cart.courses' : {'$each' : testSeriesIds}}});
+        }
         let order_id = orderCreationId;
         let payment_id =  razorpayPaymentId;
         let amount = req.body.payload.payment.entity.amount / 100;
         let package_id = req.body.payload.payment.entity.description;
            
 
-        curr_user.payment_history.unshift({ package_id, order_id, payment_id, time:Date.now(), amount });
-        await curr_user.save();
-           
+        // curr_user.payment_history.unshift({ package_id, order_id, payment_id, time:Date.now(), amount });
+        // let paymentDetails = {courseIds, testSeriesIds, orderId : orderCreationId, paymentId : razorpayPaymentId, time : Date.now(), amount}
+        // await User.updateOne({email : userEmail}, {'$push' : {'paymentHistory' : paymentDetails}});
 
         res.json({
             msg: 'success',
