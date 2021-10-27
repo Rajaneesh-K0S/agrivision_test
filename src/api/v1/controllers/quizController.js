@@ -173,6 +173,7 @@ let smallAnalysisByTopic = (analysisByTopic) => {
 module.exports.getAnalysis = async (req, res) => {
     let quizId = req.params.id;
     let userId = req.user._id;
+    // let userId = '616a40b67a5512001682343c';
     // 0 for overview, 1 for solution, 2 for weakness, 3 for comprasion 
     try {
         if (req.query.queryParam == 0) {
@@ -198,7 +199,7 @@ module.exports.getAnalysis = async (req, res) => {
         
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: {userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })                              
             }              
@@ -223,9 +224,11 @@ module.exports.getAnalysis = async (req, res) => {
                             let correctAnsString = question.correctAnswer.sort().join(',');
                             if (markedAnsString == correctAnsString) {
                                 quiz.sections[i].questions[j]['status'] = 1;
+                                quiz.sections[i].questions[j]['markedAns'] = markedAnsArray;
                             }
                             else {
                                 quiz.sections[i].questions[j]['status'] = -1;
+                                quiz.sections[i].questions[j]['markedAns'] = markedAnsArray;
                             }
                         } else {
                             quiz.sections[i].questions[j]['status'] = 0;
@@ -274,7 +277,7 @@ module.exports.getAnalysis = async (req, res) => {
                 let topperAnalysisByTopic = await findAnalysisByTopic(topperMarkedAnswers, allQuestions);
                 res.status(200).json({
                     message: "successfully fetched comparing data",
-                    data: { userAnalysisByTopic, topperAnalysisByTopic, sortedRank },
+                    data: {userId, userAnalysisByTopic, topperAnalysisByTopic, sortedRank },
                     success: true
                 })
             }
