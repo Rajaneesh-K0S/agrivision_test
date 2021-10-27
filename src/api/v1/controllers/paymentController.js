@@ -6,16 +6,6 @@ const { User } = require('../../../models');
 
 
 module.exports.order = async (req, res) => {
-    let userId = req.user._id.toString();
-    let { courseIds, testSeriesIds, origin } = req.body;
-    let courseIdString = "", testSeriesIdString = "";
-    if (courseIds.length) {
-        courseIdString = courseIds.join('$');
-    }
-    if (testSeriesIds.length) {
-        testSeriesIdString = testSeriesIds.join('$');
-    }
-
     try {
         const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
@@ -26,12 +16,6 @@ module.exports.order = async (req, res) => {
             amount: req.params.amount * 100,
             currency: 'INR',
             receipt: 'receipt_order_',
-            notes: {
-                "courseId": courseIdString,
-                "testSeriesId": testSeriesIdString,
-                "origin": origin,    // 0 for buy now, 1 for checkout
-                "userId": userId,
-            }
         };
 
         const order = await instance.orders.create(options);
@@ -45,51 +29,47 @@ module.exports.order = async (req, res) => {
 };
 
 
+
 module.exports.success = async (req, res) => {
     try {
-        const secret = process.env.RAZORPAY_SECRET2;
-        const shasum = crypto.createHmac('sha256', secret)
-        shasum.update(JSON.stringify(req.body))
-        const digest = shasum.digest('hex')
+       
+        const {
+            orderCreationId,
+            razorpayPaymentId,
+            razorpayOrderId,
+            razorpaySignature,
+        } = req.body;
 
-        if (digest !== req.headers['x-razorpay-signature'])
+
+        console.log(req.body);
+     
+        const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET);
+
+        shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
+
+        const digest = shasum.digest('hex');
+
+        // comparing our digest with the actual signature
+        if (digest !== razorpaySignature)
             return res.status(400).json({ msg: 'Transaction not legit!' });
 
-        let courseIdString = req.body.payload.payment.entity.notes.courseId;
-        let testSeriesIdString = req.body.payload.payment.entity.notes.testSeriesId;
-        // let testSeriesIdString = '6179241cd07a1a2d27daa791';
-        let origin = req.body.payload.payment.entity.notes.origin;
-        let userId = req.body.payload.payment.entity.notes.userId;
-        let courseIds = [], testSeriesIds = [];
-        if (courseIdString != "") {
-             courseIds = courseIdString.split('$');
-        }
-        if (testSeriesIdString != "") {
-             testSeriesIds = testSeriesIdString.split('$');
-        }
-        if(courseIds.length){
-            await User.updateOne({ _id: userId }, { '$push': { 'courses': { '$each': courseIds }}});
-        }
-        if(testSeriesIds.length){
-            await User.updateOne({ _id: userId }, { '$push': { 'testSeries': { '$each': testSeriesIds } } });
-        }
-        if (origin == 1) {
-            if(courseIds.length){
-                await User.updateOne({ _id: userId }, { '$pullAll': { 'cart.courses': courseIds } });
-            }
-            if(testSeriesIds.length){
-                await User.updateOne({ _id: userId }, { '$pullAll': { 'cart.testSeries': testSeriesIds } });
-            }
-        }
-        let orderId = req.body.payload.payment.entity.order_id;
-        let amount = req.body.payload.payment.entity.amount / 100;
+        let user = await User.findOne({ email:req.body.payload.payment.entity.email });
+        await user.courses.push(req.body.payload.payment.entity.description);
 
-        let paymentDetails = {courseIds, testSeriesIds, orderId, time : Date.now(), amount}
-        await User.updateOne({_id : userId}, {'$push' : {'paymentHistory' : paymentDetails}});
+        let order_id = orderCreationId;
+        let payment_id =  razorpayPaymentId;
+        let amount = req.body.payload.payment.entity.amount / 100;
+        let package_id = req.body.payload.payment.entity.description;
+           
+
+        curr_user.payment_history.unshift({ package_id, order_id, payment_id, time:Date.now(), amount });
+        await curr_user.save();
+           
 
         res.json({
             msg: 'success',
-            orderId
+            orderId: razorpayOrderId,
+            paymentId: razorpayPaymentId,
         });
     } catch (error) {
         res.status(500).send(error);

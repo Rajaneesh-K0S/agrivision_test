@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const PaymentDetailsSchema = mongoose.Schema({
-    courseIds : Array,
-    testSeriesIds : Array,
-    packageIds : Array,
-    orderId:{
+    package_id:{
+        type:String 
+    },
+    order_id:{
+        type:String
+    },
+    payment_id:{
         type:String
     },
     time:{
@@ -100,23 +103,23 @@ const userSchema = new Schema({
     },
     currentStreakDay:{
         type:Number,
-        default:0
+        defaut:0
     },
     longestStreakDay:{
         type:Number,
-        default:0
+        defaut:0
     },
     testsCompleted:{
         type:Number,
-        default:0
+        defaut:0
     },
     coursesCompleted:{
         type:Number,
-        default:0
+        defaut:0
     },
     totalTimeSpent:{
         type:Number,
-        default:0
+        defaut:0
     },
     reminder:[{
         task:String,
@@ -142,8 +145,8 @@ const userSchema = new Schema({
             type:Schema.Types.ObjectId,
             unique:true
         }]
-    }],
-    paymentHistory : [PaymentDetailsSchema]
+    }]
+    
 });
 
 const User = mongoose.model('User', userSchema);
