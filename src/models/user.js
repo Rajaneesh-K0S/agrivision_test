@@ -125,7 +125,7 @@ const userSchema = new Schema({
     cart:{
         testSeries : [{
             type : mongoose.Schema.Types.ObjectId,
-            
+            ref : 'TestSeries'  
         }],
         courses : [{
             type : mongoose.Schema.Types.ObjectId,

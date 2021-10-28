@@ -75,6 +75,7 @@ module.exports.testSeriesById = async function (req, res) {
                 testSeriesData['name'] = testSeries.name;
                 testSeriesData['price'] = testSeries.price;
                 testSeriesData['description'] = testSeries.description;
+                testSeriesData['noOfQuizzes'] = testSeries.quizzes.length;
                 testSeriesData['rating'] = testSeries.rating;
                 testSeriesData['highlights'] = testSeries.highlights;
                 testSeriesData['feedbacks'] = testSeries.feedbacks;

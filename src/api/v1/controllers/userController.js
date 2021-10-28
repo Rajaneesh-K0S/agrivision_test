@@ -332,11 +332,9 @@ module.exports.addToCart = async(req, res)=>{
             });
         }
         else if(testSeriesId){
-            user.cart.testSeries.push(courseId);
-            await user.save();
-            await User.updateOne({ _id : userId }, { '$push' : { 'cart.testSeries' : testSeriesId } });
+            await User.updateOne({ _id : userId }, { '$push' :  { 'cart.testSeries' : testSeriesId   }});
             res.status(300).json({
-                message : 'successfully added testSeries in cart',
+                message : 'successfully added test series in cart',
                 success : true
             });
         }
@@ -354,7 +352,7 @@ module.exports.addToCart = async(req, res)=>{
 module.exports.getCart = async (req, res)=>{
     let userId = req.params.id;
     try{
-        let user = await User.findById(userId).populate({path: 'cart',populate:{path:'courses'}});
+        let user = await User.findById(userId).populate({path: 'cart',populate:[{path:'courses'}, {path : 'testSeries'}]});
         let cart = user.cart;
         let testSeriesItems = [];
         let courseItems = [];
@@ -411,7 +409,7 @@ module.exports.deleteProductInCart = async function (req, res) {
             });
         }
         else if(testSeriesId){
-            await User.updateOne({ _id : userId },{ '$pull' :  { 'cart.testSeries' : courseId   }});
+            await User.updateOne({ _id : userId },{ '$pull' :  { 'cart.testSeries' : testSeriesId   }});
             res.status(300).json({
                 message : 'deleted successfully',
                 success : true
