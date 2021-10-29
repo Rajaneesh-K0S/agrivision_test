@@ -245,6 +245,7 @@ module.exports.courseProgress = async function(req, res){
         console.log(error);
         res.status(400).json({
             message : 'something went wrong',
+            error: error.message,
             success : false
         });
     }
