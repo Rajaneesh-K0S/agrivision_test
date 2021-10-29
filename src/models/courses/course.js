@@ -44,8 +44,54 @@ const courseSchema = new Schema({
     }] 
 });
 
+const packageSchema = new Schema({
+    name:String,
+    exam:String,
+    subject:[String],
+    bigImage:String,
+    smallImage:String,
+    duration:{
+        type:Number,
+        default:30
+    },
+    userEnrolled:{
+        type:Number,
+        default:100
+    },
+    testNumber:{
+        type:Number,
+        default: 2
+    },
+    videosNumber:{
+        type:Number,
+        default:30
+    },
+    rating:{
+        type:Number,
+        default:4.5
+    },  //total course rating
+    price:Number,
+    description:String,
+    highlights:[{
+        type:String
+    }],
+    feedbacks:[{
+        type : Schema.Types.ObjectId,
+        ref : 'Review'
+    }],
+    similarCourses : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Course'
+    }],
+    courses: [{
+        type:Schema.Types.ObjectId,
+        ref:'Course'
+    }]
+})
+
 
 const Course = mongoose.model('Course', courseSchema);
 const Review = mongoose.model('Review', reviewSchema);
-module.exports = { Course, Review };
+const Package = mongoose.model('Package',packageSchema)
+module.exports = { Course, Review, Package };
 

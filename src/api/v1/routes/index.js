@@ -9,6 +9,7 @@ const passport = require('passport');
 router.use('/user', require('./user'));
 router.use('/quiz', require('./quiz'));
 router.use('/course', require('./course'));
+router.use('/package',require('./package'));
 router.use('/jobs',  require('./job'));
 router.use('/testseries', require('./testSeries'));
 

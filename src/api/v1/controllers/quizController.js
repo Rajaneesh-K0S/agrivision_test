@@ -104,7 +104,6 @@ let markedAnsData = async (quizId, userId) => {
         throw new Error("User did not attempt the quiz.");
     }
     
-
 }
 
 let findTopicList = (allQuestions) => {
