@@ -1,5 +1,5 @@
 const { Course, Chapter, SubTopic, User } = require('../../../models');
-const { mdToStringConverter } = require('../../../config/mdToString');
+
 
 module.exports.allCourse = async function (req, res) {
     try {
@@ -121,10 +121,9 @@ module.exports.subTopics = async (req, res) => {
     try {
         let subTopic = await SubTopic.findById(subTopicId).populate('quiz');
         if (subTopic.contentType == 0) {
-            let stringData = await mdToStringConverter(subTopic.content);
             res.status(200).json({
                 contentType: 0,
-                data: stringData,
+                data: subTopic.content,
                 message: 'pdf data fetched successfully.',
                 success: 'true'
             });
