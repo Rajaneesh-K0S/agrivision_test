@@ -23,19 +23,19 @@ let calculateRank = (markedAnswers, allQuestions) => {
     }
     allQuestions.forEach(ques => {
         if (markedAnswers.has(ques._id.toString())) {
-            let markedAnsArray = markedAnswers.get(question._id.toString());
+            let markedAnsArray = markedAnswers.get(ques._id.toString());
             if (ques.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
             }
             let markedAnsString = markedAnsArray.sort().join(',');
-            let correctAnsString = question.correctAnswer.sort().join(',');
+            let correctAnsString = ques.correctAnswer.sort().join(',');
             if (markedAnsString == correctAnsString) {
                 obj['totalCorrect']++;
-                obj['positiveMarks'] += ques.positiveMarks;
-                obj['totalScore'] += ques.positiveMarks;
+                obj['positiveMarks'] += ques.marking;
+                obj['totalScore'] += ques.marking;
             } else {
                 obj['totalInorrect']++;
-                obj['totalScore'] -= ques.negativeMarks;
+                obj['totalScore'] -= ques.negMarking;
             }
         } else {
             obj['unattempted']++;
@@ -286,7 +286,8 @@ module.exports.clearAnswer = async (req, res) => {
 module.exports.submitQuiz = async (req, res) => {
     try {
         const quizId = req.params.id;
-        const userId = req.user._id
+        const userId = req.user._id;
+        // const userId = '616a40b67a5512001682343c';
         const quiz = await Quiz.findById(quizId);
         const startTime = quiz.startTime;
         const finishedTime = Math.min(new Date().getTime(), quiz.endTime);
