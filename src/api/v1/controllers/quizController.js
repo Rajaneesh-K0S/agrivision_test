@@ -13,7 +13,7 @@ let markedAnsData = async (quizId, userId) => {
 }
 
 
-let calculateRank =  (markedAnswers, allQuestions) => {
+let calculateRank = (markedAnswers, allQuestions) => {
     let obj = {
         totalCorrect: 0,
         totalIncorrect: 0,
@@ -24,7 +24,7 @@ let calculateRank =  (markedAnswers, allQuestions) => {
     allQuestions.forEach(ques => {
         if (markedAnswers.has(ques._id.toString())) {
             let markedAnsArray = markedAnswers.get(question._id.toString());
-            if(ques.questionType != 2){
+            if (ques.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
             }
             let markedAnsString = markedAnsArray.sort().join(',');
@@ -44,26 +44,26 @@ let calculateRank =  (markedAnswers, allQuestions) => {
     return obj;
 }
 
-module.exports.calculateRankForAll = async (quizId)=>{
-    try{
-        let ranks = await Rank.find({quizId});
-        for(let i =0;i<ranks.length ; i++){
+module.exports.calculateRankForAll = async (quizId) => {
+    try {
+        let ranks = await Rank.find({ quizId });
+        for (let i = 0; i < ranks.length; i++) {
             let userId = ranks[i].userId;
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
-            let obj =  calculateRank(markedAnswers, allQuestions);
-            await Rank.findOneAndUpdate({userId, quizId}, obj);
+            let obj = calculateRank(markedAnswers, allQuestions);
+            await Rank.findOneAndUpdate({ userId, quizId }, obj);
         }
         res.status(200).json({
-            message : "successfully calculated rank for all the users of the quiz",
-            success : true
+            message: "successfully calculated rank for all the users of the quiz",
+            success: true
         })
     }
-    catch(err){
+    catch (err) {
         res.status(500).json({
-            message : err.message,
-            success : false
+            message: err.message,
+            success: false
         })
-    }   
+    }
 }
 
 
@@ -89,7 +89,7 @@ let findAnalysisByTopic = async (markedAnswers, allQuestions) => {
         if (markedAnswers.has(question._id.toString())) {
             obj['attempted']++;
             let markedAnsArray = markedAnswers.get(question._id.toString());
-            if(question.questionType != 2){
+            if (question.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
             }
             let markedAnsString = markedAnsArray.sort().join(',');
@@ -154,23 +154,23 @@ module.exports.isSubscribed = async (req, res, next) => {
     let isSubscribed = false;
     try {
         if (quizId && userId) {
-            let quiz = await Quiz.findOne({ _id: quizId }, { "isPublic": 1, "registeredUsers": 1, "quizType" : 1});
+            let quiz = await Quiz.findOne({ _id: quizId }, { "isPublic": 1, "registeredUsers": 1, "quizType": 1 });
             if (quiz) {
                 if (quiz.isPublic || quiz.registeredUsers.includes(userId)) {
                     isSubscribed = true;
                 } else {
-                    if(quiz.quizType == 1){
-                        let testSeries = await TestSeries.findOne({ "quizzes": quizId }, {_id : 1});
+                    if (quiz.quizType == 1) {
+                        let testSeries = await TestSeries.findOne({ "quizzes": quizId }, { _id: 1 });
                         if (testSeries) {
-                            let user = await User.findOne({ _id: userId, "testSeries": testSeries._id }, {_id : 1});
+                            let user = await User.findOne({ _id: userId, "testSeries": testSeries._id }, { _id: 1 });
                             if (user) {
                                 isSubscribed = true;
                             }
                         }
-                    }else if(quiz.quizType == 2){
-                        let course = await Course.findOne({ "fullTests": quizId }, {_id : 1});
+                    } else if (quiz.quizType == 2) {
+                        let course = await Course.findOne({ "fullTests": quizId }, { _id: 1 });
                         if (course) {
-                            let user = await User.findOne({ _id: userId, "courses": course._id }, {_id : 1});
+                            let user = await User.findOne({ _id: userId, "courses": course._id }, { _id: 1 });
                             if (user) {
                                 isSubscribed = true;
                             }
@@ -195,25 +195,38 @@ module.exports.isSubscribed = async (req, res, next) => {
 }
 
 module.exports.startQuiz = async (req, res) => {
+    let userId = req.user._id;
+    let quizId = req.params.id;
     try {
-        if(req.body.isSubscribed){
-            const { id } = req.params;
-            const quiz = await Quiz.findById(id).populate({ path: 'sections', populate: { path: 'questions' } });    
-            let rank = await Rank.findOne({ userId: req.user._id, quizId: id });
+        if (req.body.isSubscribed) {
+            let isSubscribed = true;
+            let msg = '';
+            const quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
+            let rank = await Rank.findOne({ userId, quizId });
             if (!rank) {
-                rank = new Rank({ quizId: id, userId: req.user._id, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                rank = new Rank({ quizId, userId, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
                 await rank.save();
+                isSubscribed = true;
+                msg = 'quiz was successfully found and sent';
+            }else if(!rank.isSubmitted){
+                isSubscribed = true;
+                msg = 'quiz was successfully found and sent';
+            }else if(rank.isSubmitted){
+                isSubscribed = false;
+                msg = 'You have already attempted the quiz';
             }
             res.status(200).json({
-                isSubscribed : true,
-                data: quiz,
-                message: 'quiz was successfully found and sent',
-                success: true
-            });
-        }else{
+                    isSubscribed: isSubscribed,
+                    data: (isSubscribed)?quiz:null,
+                    message: msg,
+                    success: true
+                });
+
+        } else {
             res.status(200).json({
-                isSubscribed : false,
-                success : true
+                isSubscribed: false,
+                message: "You are not registered for this quiz.",
+                success: true
             })
         }
     } catch (err) {
@@ -272,7 +285,7 @@ module.exports.clearAnswer = async (req, res) => {
 
 module.exports.submitQuiz = async (req, res) => {
     try {
-        const quizId  = req.params.id;
+        const quizId = req.params.id;
         const userId = req.user._id
         const quiz = await Quiz.findById(quizId);
         const startTime = quiz.startTime;
@@ -346,7 +359,7 @@ module.exports.getAnalysis = async (req, res) => {
                         let question = sections[i].questions[j];
                         if (markedAnswers.has(question._id.toString())) {
                             let markedAnsArray = markedAnswers.get(question._id.toString());
-                            if(question.questionType != 2){
+                            if (question.questionType != 2) {
                                 markedAnsArray = markedAnsArray.map(v => v + 1);
                             }
                             let markedAnsString = markedAnsArray.sort().join(',');
