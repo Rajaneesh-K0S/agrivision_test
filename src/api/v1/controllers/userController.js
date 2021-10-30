@@ -320,6 +320,7 @@ module.exports.addToCart = async(req, res)=>{
     let userId = req.params.id;
     let courseId = req.body.courseId;
     let testSeriesId = req.body.testSeriesId;
+    let packageId = req.body.packageId
     try{
         //let user = await User.findById(userId);
         if(courseId){
@@ -333,6 +334,13 @@ module.exports.addToCart = async(req, res)=>{
         }
         else if(testSeriesId){
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.testSeries' : testSeriesId   }});
+            res.status(300).json({
+                message : 'successfully added test series in cart',
+                success : true
+            });
+        }
+        else if(testSeriesId){
+            await User.updateOne({ _id : userId }, { '$push' :  { 'cart.packages' : packageId   }});
             res.status(300).json({
                 message : 'successfully added test series in cart',
                 success : true
@@ -352,10 +360,11 @@ module.exports.addToCart = async(req, res)=>{
 module.exports.getCart = async (req, res)=>{
     let userId = req.params.id;
     try{
-        let user = await User.findById(userId).populate({path: 'cart',populate:[{path:'courses'}, {path : 'testSeries'}]});
+        let user = await User.findById(userId).populate({path: 'cart',populate:[{path:'courses'}, {path : 'testSeries'},{path: 'packages'}]});
         let cart = user.cart;
         let testSeriesItems = [];
         let courseItems = [];
+        let packageItems = [];
         let totalAmount = 0;
         cart.testSeries.forEach(test=>{
             totalAmount += test.price;
@@ -377,11 +386,21 @@ module.exports.getCart = async (req, res)=>{
             itemObj['image'] = course.smallImage;
             courseItems.push(itemObj); 
         });
+        cart.packages.forEach(package=>{
+            totalAmount += package.price;
+            let itemObj = {};
+            itemObj['name'] = package.name;
+            itemObj['price'] = package.price;
+            itemObj['description'] = package.description;
+            itemObj['packageId'] = package._id;
+            itemObj['image'] = package.smallImage;
+            packageItems.push(itemObj); 
+        });
          
-        let totalItems = testSeriesItems.length + courseItems.length;
+        let totalItems = testSeriesItems.length + courseItems.length + packageItems.length;
 
         res.status(200).json({
-            data : { totalItems, courseItems, testSeriesItems, totalAmount },
+            data : { totalItems, courseItems, testSeriesItems, packageItems, totalAmount },
             message : 'successfully fetched cart data',
             success : true
         });
@@ -399,6 +418,7 @@ module.exports.deleteProductInCart = async function (req, res) {
     let userId = req.params.id;
     let courseId = req.body.courseId;
     let testSeriesId = req.body.testSeriesId;
+    let packageId = req.body.packageId
     try{
         
         if(courseId){
@@ -410,6 +430,13 @@ module.exports.deleteProductInCart = async function (req, res) {
         }
         else if(testSeriesId){
             await User.updateOne({ _id : userId },{ '$pull' :  { 'cart.testSeries' : testSeriesId   }});
+            res.status(300).json({
+                message : 'deleted successfully',
+                success : true
+            });
+        }
+        else if(packageId){
+            await User.updateOne({ _id : userId },{ '$pull' :  { 'cart.packages' : packageId   }});
             res.status(300).json({
                 message : 'deleted successfully',
                 success : true

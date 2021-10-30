@@ -130,8 +130,17 @@ const userSchema = new Schema({
         courses : [{
             type : mongoose.Schema.Types.ObjectId,
             ref : 'Course'
+        }],
+        packages : [{
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'Package'
         }]
+
     },
+    packages : [{
+        type:Schema.Types.ObjectId,
+        ref:'Package'
+    }],
     testSeries : [{
         type : Schema.Types.ObjectId,
         ref : 'TestSeries'
