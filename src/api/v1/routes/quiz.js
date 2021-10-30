@@ -6,8 +6,7 @@ const { showAllQuizzes, startQuiz ,saveAnswer,clearAnswer, getAnalysis, isSubscr
 
 router.get('/',passport.authenticate('jwt', { session:false }), showAllQuizzes);
 // //612a97d7be74275fbc15b080
-router.get('/:id/issubscribed', passport.authenticate('jwt', {session:false}), isSubscribed);
-router.get('/:id',passport.authenticate('jwt', { session:false }) ,startQuiz);
+router.get('/:id',passport.authenticate('jwt', { session:false }) ,isSubscribed, startQuiz);
 
 router.post('/:id', passport.authenticate('jwt', { session:false }),saveAnswer);
 router.delete('/:id', passport.authenticate('jwt', { session:false }),clearAnswer);

@@ -150,7 +150,7 @@ module.exports.showAllQuizzes = async (req, res) => {
     }
 };
 
-module.exports.isSubscribed = async (req, res) => {
+module.exports.isSubscribed = async (req, res, next) => {
     let quizId = req.params.id;
     let userId = req.user._id;
     let isSubscribed = false;
@@ -179,10 +179,8 @@ module.exports.isSubscribed = async (req, res) => {
                         }
                     }
                 }
-                res.status(200).json({
-                    isSubscribed,
-                    success : true
-                })
+                req.body['isSubscribed'] = isSubscribed;
+                next();
             }
             else {
                 throw new Error("no such quiz exist");
@@ -200,27 +198,26 @@ module.exports.isSubscribed = async (req, res) => {
 
 module.exports.startQuiz = async (req, res) => {
     try {
-        const { id } = req.params;
-        const quiz = await Quiz.findById(id).populate({ path: 'sections', populate: { path: 'questions' } });
-        if (!quiz) {
-            return res.status(400).json({
-                message: 'no such quiz exist',
-                success: false
+        if(req.body.isSubscribed){
+            const { id } = req.params;
+            const quiz = await Quiz.findById(id).populate({ path: 'sections', populate: { path: 'questions' } });    
+            let rank = await Rank.findOne({ userId: req.user._id, quizId: id });
+            if (!rank) {
+                rank = new Rank({ quizId: id, userId: req.user._id, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                await rank.save();
+            }
+            res.status(200).json({
+                isSubscribed : true,
+                data: quiz,
+                message: 'quiz was successfully found and sent',
+                success: true
+            });
+        }else{
+            res.status(200).json({
+                isSubscribed : false,
+                success : true
             })
         }
-
-        let rank = await Rank.findOne({ userId: req.user._id, quizId: id });
-        if (!rank) {
-            rank = new Rank({ quizId: id, userId: req.user._id, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
-            await rank.save();
-        }
-
-        res.status(200).json({
-            data: quiz,
-            message: 'quiz was successfully found and sent',
-            success: true
-        });
-
     } catch (err) {
         return res.status(500).json({
             message: err.message,
