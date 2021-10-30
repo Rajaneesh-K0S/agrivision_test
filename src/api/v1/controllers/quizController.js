@@ -19,7 +19,6 @@ let calculateRank =  (markedAnswers, allQuestions) => {
         totalIncorrect: 0,
         unattempted: 0,
         positiveMarks: 0,
-        negativeMarks: 0,
         totalScore: 0
     }
     allQuestions.forEach(ques => {
@@ -36,7 +35,6 @@ let calculateRank =  (markedAnswers, allQuestions) => {
                 obj['totalScore'] += ques.positiveMarks;
             } else {
                 obj['totalInorrect']++;
-                obj['negativeMarks'] += ques.negativeMarks;
                 obj['totalScore'] -= ques.negativeMarks;
             }
         } else {
@@ -274,7 +272,7 @@ module.exports.clearAnswer = async (req, res) => {
 
 module.exports.submitQuiz = async (req, res) => {
     try {
-        const { quizId } = req.params.id;
+        const quizId  = req.params.id;
         const userId = req.user._id
         const quiz = await Quiz.findById(quizId);
         const startTime = quiz.startTime;
