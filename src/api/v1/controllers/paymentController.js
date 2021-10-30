@@ -1,20 +1,23 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const { User } = require('../../../models');
+const { User, Package } = require('../../../models');
 
 
 
 
 module.exports.order = async (req, res) => {
     let userId = req.user._id.toString();
-    let { courseIds, testSeriesIds, origin } = req.body;
-    let courseIdString = "", testSeriesIdString = "";
+    let { courseIds, testSeriesIds, packageIds, origin } = req.body;
+    let courseIdString = "", testSeriesIdString = "", packageIdString = "";
     try {
         if (courseIds && courseIds.length) {
             courseIdString = courseIds.join('$');
         }
         if (testSeriesIds && testSeriesIds.length) {
             testSeriesIdString = testSeriesIds.join('$');
+        }
+        if (packageIds && packageIds.length) {
+            packageIdString = packageIds.join('$');
         }
         const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
@@ -28,6 +31,7 @@ module.exports.order = async (req, res) => {
             notes: {
                 "courseId": courseIdString,
                 "testSeriesId": testSeriesIdString,
+                "packageId": packageIdString,
                 "origin": origin,    // 0 for buy now, 1 for checkout
                 "userId": userId,
             }
@@ -68,21 +72,32 @@ module.exports.success = async (req, res) => {
 
         let courseIdString = req.body.payload.payment.entity.notes.courseId;
         let testSeriesIdString = req.body.payload.payment.entity.notes.testSeriesId;
+        let packageIdString = req.body.payload.payment.entity.notes.packageId;
         // let testSeriesIdString = '6179241cd07a1a2d27daa791';
         let origin = req.body.payload.payment.entity.notes.origin;
         let userId = req.body.payload.payment.entity.notes.userId;
-        let courseIds = [], testSeriesIds = [];
+        let courseIds = [], testSeriesIds = [], packageIds = [];
         if (courseIdString != "") {
              courseIds = courseIdString.split('$');
         }
         if (testSeriesIdString != "") {
              testSeriesIds = testSeriesIdString.split('$');
         }
+        if (packageIdString != "") {
+             packageIds = packageIdString.split('$');
+        }
         if(courseIds.length){
             await User.updateOne({ _id: userId }, { '$push': { 'courses': { '$each': courseIds }}});
         }
         if(testSeriesIds.length){
             await User.updateOne({ _id: userId }, { '$push': { 'testSeries': { '$each': testSeriesIds } } });
+        }
+        if(packageIds.length){
+            await User.updateOne({ _id: userId }, { '$push': { 'packages': { '$each': packageIds } } });
+            for(let i = 0 ;i< packageIds.length; i++){
+                let pack = await Package.findOne({_id : packageIds[i]}, {"courses" : 1});
+                await User.updateOne({_id : userId}, {'$push' : {'courses' : {'$each' : pack.courses}}});
+            }
         }
         if (origin == 1) {
             if(courseIds.length){
@@ -91,11 +106,14 @@ module.exports.success = async (req, res) => {
             if(testSeriesIds.length){
                 await User.updateOne({ _id: userId }, { '$pullAll': { 'cart.testSeries': testSeriesIds } });
             }
+            if(packageIds.length){
+                await User.updateOne({ _id: userId }, { '$pullAll': { 'cart.packages': packageIds } });
+            }
         }
         let orderId = req.body.payload.payment.entity.order_id;
         let amount = req.body.payload.payment.entity.amount / 100;
 
-        let paymentDetails = {courseIds, testSeriesIds, orderId, time : Date.now(), amount}
+        let paymentDetails = {courseIds, testSeriesIds, packageIds, orderId, time : Date.now(), amount}
         await User.updateOne({_id : userId}, {'$push' : {'paymentHistory' : paymentDetails}});
 
         res.status(200).json({
