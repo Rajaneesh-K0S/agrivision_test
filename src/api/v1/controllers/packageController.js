@@ -43,7 +43,7 @@ module.exports.packageById = async(req,res)=>{
     try {
        
             let packageId = req.params.id;
-            let package = await Package.findById(packageId).populate([{path:'courses',select:'name'},{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
+            let package = await Package.findById(packageId).populate([{path:'courses'},{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
             let ratingsCount = [0, 0, 0, 0, 0];
             let totalRatings = package.feedbacks.length;
             package.feedbacks.forEach(feedback=>{
