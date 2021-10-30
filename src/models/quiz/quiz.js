@@ -11,7 +11,7 @@ const quizTableSchema = new Schema({
     syllabus:[{
         type:String
     }],
-    quizType: Number, //[0-General,1-Test Series,2-Course]
+    quizType: Number, //[0-General,1-Test Series,2-Course,3-practice]
     sections:[{
         name:String,
         questions : [{
