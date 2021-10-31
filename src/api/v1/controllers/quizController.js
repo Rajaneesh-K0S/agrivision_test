@@ -323,6 +323,7 @@ module.exports.getAnalysis = async (req, res) => {
             let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
             let quizData = await Quiz.findOne({ _id: quizId }, { name: 1, maxScore: 1, totalNoQuestions: 1, totalTime: 1, chapters: 1 });
             if (rank) {
+                let quizName = quizData.name;
                 let obtainedMarks = rank.totalScore;
                 let maxMarks = quizData.maxScore;
                 let totalQuestions = quizData.totalNoQuestions;
@@ -341,7 +342,7 @@ module.exports.getAnalysis = async (req, res) => {
 
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: { quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })
             }
