@@ -315,6 +315,7 @@ module.exports.submitQuiz = async (req, res) => {
 module.exports.getAnalysis = async (req, res) => {
     let quizId = req.params.id;
     let userId = req.user._id;
+    let userName = req.user.name;
     // let userId = '616a40b67a5512001682343c';
     // 0 for overview, 1 for solution, 2 for weakness, 3 for comprasion 
     try {
@@ -342,7 +343,7 @@ module.exports.getAnalysis = async (req, res) => {
 
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: { userName,quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })
             }
