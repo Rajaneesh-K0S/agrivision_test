@@ -339,7 +339,7 @@ module.exports.addToCart = async(req, res)=>{
                 success : true
             });
         }
-        else if(testSeriesId){
+        else if(packageId){
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.packages' : packageId   }});
             res.status(300).json({
                 message : 'successfully added test series in cart',
