@@ -343,7 +343,7 @@ module.exports.getAnalysis = async (req, res) => {
 
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { userName,quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: { quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })
             }
@@ -383,7 +383,7 @@ module.exports.getAnalysis = async (req, res) => {
                 }
                 res.status(200).json({
                     message: "successfully fetched solution data",
-                    data: quiz,
+                    data: {quiz,userName},
                     success: true
                 })
             } else {
