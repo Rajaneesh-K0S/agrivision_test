@@ -34,7 +34,7 @@ let calculateRank = (markedAnswers, allQuestions) => {
                 obj['positiveMarks'] += ques.marking;
                 obj['totalScore'] += ques.marking;
             } else {
-                obj['totalInorrect']++;
+                obj['totalIncorrect']++;
                 obj['totalScore'] -= ques.negMarking;
             }
         } else {
