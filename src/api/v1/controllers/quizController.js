@@ -44,7 +44,8 @@ let calculateRank = (markedAnswers, allQuestions) => {
     return obj;
 }
 
-module.exports.calculateRankForAll = async (quizId) => {
+module.exports.calculateRankForAll = async (req, res) => {
+    let quizId = req.params.id;
     try {
         let ranks = await Rank.find({ quizId });
         for (let i = 0; i < ranks.length; i++) {
