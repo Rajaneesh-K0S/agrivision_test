@@ -200,28 +200,27 @@ module.exports.startQuiz = async (req, res) => {
     let quizId = req.params.id;
     try {
         if (req.body.isSubscribed) {
-            let isSubscribed = true;
+            let isAttempted = false;
             let msg = '';
             const quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
             let rank = await Rank.findOne({ userId, quizId });
             if (!rank) {
                 rank = new Rank({ quizId, userId, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
                 await rank.save();
-                isSubscribed = true;
                 msg = 'quiz was successfully found and sent';
             }else if(!rank.isSubmitted){
-                isSubscribed = true;
                 msg = 'quiz was successfully found and sent';
             }else if(rank.isSubmitted){
-                isSubscribed = false;
+                isAttempted = true;
                 msg = 'You have already attempted the quiz';
             }
             res.status(200).json({
-                    isSubscribed: isSubscribed,
-                    data: (isSubscribed)?quiz:null,
-                    message: msg,
-                    success: true
-                });
+                isSubscribed: true,
+                isAttempted,
+                data: (req.body.isSubscribed)?quiz:null,
+                message: msg,
+                success: true
+            });
 
         } else {
             res.status(200).json({

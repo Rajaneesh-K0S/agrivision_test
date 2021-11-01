@@ -27,6 +27,7 @@ const quizTableSchema = new Schema({
     totalTime : Number,
     startTime : Number,
     endTime: Number,
+    showAnalysisTime: Number,
     courseId:{
         type: Schema.Types.ObjectId,
         ref:'Course'
