@@ -199,10 +199,10 @@ module.exports.startQuiz = async (req, res) => {
     let userId = req.user._id;
     let quizId = req.params.id;
     try {
+        const quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
         if (req.body.isSubscribed) {
             let isAttempted = false;
             let msg = '';
-            const quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
             let rank = await Rank.findOne({ userId, quizId });
             if (!rank) {
                 rank = new Rank({ quizId, userId, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
@@ -225,6 +225,7 @@ module.exports.startQuiz = async (req, res) => {
         } else {
             res.status(200).json({
                 isSubscribed: false,
+                data: quiz,
                 message: "You are not registered for this quiz.",
                 success: true
             })
