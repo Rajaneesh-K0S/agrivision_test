@@ -27,7 +27,11 @@ let testSeriesSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'TestSeries'
 
-    }]
+    }],
+    shareAndEarnCoupen : {
+        type : Schema.Types.ObjectId,
+        ref : 'Coupen'
+    }
 })
 
 let TestSeries = mongoose.model('TestSeries', testSeriesSchema);

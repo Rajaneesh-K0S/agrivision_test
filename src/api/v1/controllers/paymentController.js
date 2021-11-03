@@ -33,7 +33,7 @@ module.exports.order = async (req, res) => {
                 "testSeriesId": testSeriesIdString,
                 "packageId": packageIdString,
                 "origin": origin,    // 0 for buy now, 1 for checkout
-                "userId": userId,
+                "userId": userId
             }
         };
 

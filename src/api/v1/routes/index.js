@@ -15,7 +15,7 @@ router.use('/testseries', require('./testSeries'));
 
 router.use('/payment', require('./payment'));
 router.use('/article',require('./article'));
-
+router.use('/coupens', require('./coupen'));
 
 router.use('/magazine', passport.authenticate('jwt', { session:false }), require('./magazine'));
 router.use('/academics', require('./academics'));

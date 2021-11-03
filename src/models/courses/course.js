@@ -41,7 +41,11 @@ const courseSchema = new Schema({
     similarCourses : [{
         type : Schema.Types.ObjectId,
         ref : 'Course'
-    }] 
+    }],
+    shareAndEarnCoupen : {
+        type : Schema.Types.ObjectId,
+        ref : 'Coupen'
+    }
 });
 
 const packageSchema = new Schema({
@@ -86,7 +90,11 @@ const packageSchema = new Schema({
     courses: [{
         type:Schema.Types.ObjectId,
         ref:'Course'
-    }]
+    }],
+    shareAndEarnCoupen : {
+        type : Schema.Types.ObjectId,
+        ref : 'Coupen'
+    }
 })
 
 
