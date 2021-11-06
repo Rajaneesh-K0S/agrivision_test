@@ -1,22 +1,15 @@
 const mongoose = require('mongoose');
 const {Schema} =mongoose;
-//const multer = require('multer');
-// const path = require('path');
-//const ARTICLE_PATH = path.join('/uploads/articles');
+const multer = require('multer');
+ const path = require('path');
+const ARTICLE_PATH = path.join('/uploads/articles');
 
-const contentSchema=new mongoose.Schema({
-    paragraph:{
-        type:String
-    },
-    image:{
-        type:String
-    }
-})
 
 
 const articleCommentsSchema = new Schema({
     comment:{
-        type:String
+        type:String,
+        required: true
     },
     user:{
         type:String
@@ -29,14 +22,16 @@ const articleSchema = new mongoose.Schema({
             ref: 'User' 
         }
     ,
-    type:{
-        type:String
+    category:{
+        type:Number
     },
     likes:{
-        type:Number
+        type:Number,
+        default: 0
     },
-    viwes:{
-        type:Number
+    views:{
+        type:Number,
+        default: 0
     },
     heading: {
         type: String,
@@ -50,7 +45,15 @@ const articleSchema = new mongoose.Schema({
     highlights:[{
         type:String
     }],
-    content:[contentSchema],
+    isFeatured:{
+        type: Boolean,
+        default: false
+    },
+    isSpotlight:{
+        type: Boolean,
+        default: false
+    },
+    content: String,
     comments:[articleCommentsSchema]
 
 }, {
@@ -59,17 +62,17 @@ const articleSchema = new mongoose.Schema({
 
 
 
-// let storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//       cb(null, path.join(__dirname, '..', ARTICLE_PATH));
-//     },
-//     filename: function (req, file, cb) {
-//       cb(null, file.fieldname + '-' + Date.now());
-//     }
-//   });
+let storage = multer.diskStorage({
+     destination: function (req, file, cb) {
+       cb(null, path.join(__dirname, '..','/..', ARTICLE_PATH));
+     },
+     filename: function (req, file, cb) {
+       cb(null, file.fieldname + '-' + Date.now());
+     }
+});
 
-// articleSchema.statics.upload = multer({storage:storage}).single('article_file');
-// articleSchema.statics.avatarPath = ARTICLE_PATH;
+articleSchema.statics.upload = multer({storage:storage}).single('article_file');
+articleSchema.statics.avatarPath = ARTICLE_PATH;
 
 
 const Article = mongoose.model('Article', articleSchema);

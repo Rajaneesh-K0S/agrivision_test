@@ -31,6 +31,9 @@ const userSchema = new Schema({
         required: true,
         unique: true
     },
+    linkedinProfile: {
+        type: String
+    },
     contactNumber : {
         type : Number
     },
@@ -47,6 +50,15 @@ const userSchema = new Schema({
         type: String
     },
     provider: {
+        type: String
+    },
+    institute:{
+        type: String
+    },
+    department:{
+        type: String
+    },
+    designation:{
         type: String
     },
     isVerified: {
