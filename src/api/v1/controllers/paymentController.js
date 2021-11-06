@@ -1,14 +1,17 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const { User, Package } = require('../../../models');
+const { User, Package, Coupen } = require('../../../models');
 
 
 
 
 module.exports.order = async (req, res) => {
     let userId = req.user._id.toString();
-    let { courseIds, testSeriesIds, packageIds, origin } = req.body;
-    let courseIdString = "", testSeriesIdString = "", packageIdString = "";
+    let { courseIds, testSeriesIds, packageIds, origin, shareAndEarn } = req.body;
+    let courseIdString = "", testSeriesIdString = "", packageIdString = "", shareAndEarnString = "";
+    if(shareAndEarn){
+        shareAndEarnString = shareAndEarn.case.toString() + '$' + shareAndEarn.generator.toString() + '$' + shareAndEarn.coupenId.toString(); 
+    }
     try {
         if (courseIds && courseIds.length) {
             courseIdString = courseIds.join('$');
@@ -33,7 +36,8 @@ module.exports.order = async (req, res) => {
                 "testSeriesId": testSeriesIdString,
                 "packageId": packageIdString,
                 "origin": origin,    // 0 for buy now, 1 for checkout
-                "userId": userId
+                "userId": userId,
+                "shareAndEarn" : shareAndEarnString
             }
         };
 
@@ -73,7 +77,7 @@ module.exports.success = async (req, res) => {
         let courseIdString = req.body.payload.payment.entity.notes.courseId;
         let testSeriesIdString = req.body.payload.payment.entity.notes.testSeriesId;
         let packageIdString = req.body.payload.payment.entity.notes.packageId;
-        // let testSeriesIdString = '6179241cd07a1a2d27daa791';
+        let shareAndEarnString = req.body.payload.payment.entity.notes.shareAndEarn;
         let origin = req.body.payload.payment.entity.notes.origin;
         let userId = req.body.payload.payment.entity.notes.userId;
         let courseIds = [], testSeriesIds = [], packageIds = [];
@@ -116,6 +120,21 @@ module.exports.success = async (req, res) => {
         let paymentDetails = {courseIds, testSeriesIds, packageIds, orderId, time : Date.now(), amount}
         await User.updateOne({_id : userId}, {'$push' : {'paymentHistory' : paymentDetails}});
 
+        if(shareAndEarnString){
+            let arr = shareAndEarnString.split('$');
+            let generatorId = arr[1];
+            let coupenId = arr[2];
+            let coupen = await Coupen.findById(coupenId);
+            if(arr[0] == 1){       // 0 for generator, 1 for receiver.
+                let val = coupen.generatedUsers.get(generatorId.toString());
+                val -= 1;
+                coupen.generatedUsers.set(generatorId, val);
+                await coupen.save();
+            }else{
+                coupen.generatedUsers.delete(generatorId);
+                await coupen.save();
+            }
+        }
         res.status(200).json({
             msg: 'success',
             orderId

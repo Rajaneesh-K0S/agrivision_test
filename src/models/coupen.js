@@ -11,10 +11,11 @@ const coupenSchema = new Schema({
         unique : true
     },
     type : Number, // [0 for coupens on checkout page, 1 for share and earn]
-    discount : Number,
-    generatorDiscount : Number,
-    receiverDiscount : Number, 
-    noOfReferralsReq : {
+                                      // all discounts in percentage.
+    discount : Number,                // normal discount for type 0 coupens.
+    generatorDiscount : Number,       // discount for the user who has generated the referral link.
+    receiverDiscount : Number,        // discount for the user who is using referral link.
+    noOfReferralsReq : {    // no of referrals req for type 1 coupens.
         type : Number, 
         default : 1
     },
@@ -22,13 +23,13 @@ const coupenSchema = new Schema({
         type : Boolean,
         default : false
     },
-    noOfRedeems : {        //no of times a coupen can be used.
+    noOfRedeems : {        //no of times a coupen can be used(for type 0 coupens.).
         type : Number,
         default : 0
     },  
-    generatedUsers : {
+    generatedUsers : {    // users who have created a referral link.(for type 1 coupens)
         type : Map,
-        of : Number
+        of : Number       // represents the number of remaining referrals a user has to do.
     }
 });
 

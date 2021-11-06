@@ -124,7 +124,7 @@ module.exports.applyDiscountForGeneratorUser = async (req, res) => {
                 if(coupen.generatedUsers.has(userId.toString())){
                     let val = coupen.generatedUsers.get(userId);
                     if(val == 0){
-                        let discount = coupen.generatorDiscount;
+                        discount = coupen.generatorDiscount;
                         isCoupen = true;
                         msg = "successfully applied discount."
                     }else{
@@ -147,6 +147,8 @@ module.exports.applyDiscountForGeneratorUser = async (req, res) => {
 
         res.status(200).json({
             isCoupen,
+            coupenId,
+            userId,
             discount,
             message : msg,
             success : true
