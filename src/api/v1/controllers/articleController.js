@@ -66,7 +66,7 @@ module.exports.addLike=async function(req,res){
     article.likes++;
     await article.save();
     res.status(200).json({
-      message: 'comment added',
+      message: 'Article Liked',
       success: true
   });
   } catch (error) {
