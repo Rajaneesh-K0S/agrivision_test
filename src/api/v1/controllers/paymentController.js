@@ -99,8 +99,9 @@ module.exports.success = async (req, res) => {
         if(packageIds.length){
             await User.updateOne({ _id: userId }, { '$push': { 'packages': { '$each': packageIds } } });
             for(let i = 0 ;i< packageIds.length; i++){
-                let pack = await Package.findOne({_id : packageIds[i]}, {"courses" : 1});
+                let pack = await Package.findOne({_id : packageIds[i]}, {"courses" : 1, "testSeries" : 1});
                 await User.updateOne({_id : userId}, {'$push' : {'courses' : {'$each' : pack.courses}}});
+                await User.updateOne({_id : userId}, {'$push' : {'testSeries' : {'$each' : pack.testSeries}}});
             }
         }
         if (origin == 1) {

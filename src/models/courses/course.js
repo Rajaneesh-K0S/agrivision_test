@@ -91,6 +91,10 @@ const packageSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Course'
     }],
+    testSeries: [{
+        type : Schema.Types.ObjectId,
+        ref: 'TestSeries'
+    }],
     shareAndEarnCoupen : {
         type : Schema.Types.ObjectId,
         ref : 'Coupen'

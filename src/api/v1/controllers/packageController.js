@@ -5,12 +5,12 @@ module.exports.getAllPackages = async(req,res)=>{
     try {
         let packages;
         if(req.query.exam){
-            packages = await Package.find({ 'exam':req.query.exam }).populate({path: 'courses',select:'name'});
+            packages = await Package.find({ 'exam':req.query.exam }).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
         }
         else if (req.query.subject) {
-            packages = await Package.find({ 'subject':req.query.subject }).populate({path: 'courses',select:'name'});
+            packages = await Package.find({ 'subject':req.query.subject }).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
         } else {
-            packages = await Package.find({}).populate({path: 'courses',select:'name'});
+            packages = await Package.find({}).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
         }
         let data = [];
         packages.forEach(element => {
@@ -22,6 +22,7 @@ module.exports.getAllPackages = async(req,res)=>{
                 testNumber: element.testNumber,
                 videosNumber: element.videosNumber,
                 courses: element.courses,
+                testSeries: element.testSeries
             });
         });
 
@@ -43,7 +44,7 @@ module.exports.packageById = async(req,res)=>{
     try {
        
             let packageId = req.params.id;
-            let package = await Package.findById(packageId).populate([{path:'courses'},{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
+            let package = await Package.findById(packageId).populate([{path:'courses'},{path : 'testSeries'},{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
             let ratingsCount = [0, 0, 0, 0, 0];
             let totalRatings = package.feedbacks.length;
             package.feedbacks.forEach(feedback=>{
@@ -68,6 +69,7 @@ module.exports.packageById = async(req,res)=>{
             packageData['name'] = package.name;
             packageData['price'] = package.price;
             packageData['courses'] = package.courses;
+            packageData['testSeries'] = package.testSeries;
             packageData['fullTestCount'] = package.testNumber;
             packageData['description'] = package.description;
             packageData['rating'] = package.rating;
