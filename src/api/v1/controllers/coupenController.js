@@ -161,3 +161,40 @@ module.exports.applyDiscountForGeneratorUser = async (req, res) => {
         })
     }
 }
+
+
+module.exports.checkoutDiscount = async (req, res) => {
+    let {coupenCode} = req.query;
+    try{
+        let msg = "";
+        let isCoupen = false;
+        let discount = null;
+        let coupenId = "";
+        let coupen = await Coupen.findOne({code : coupenCode});
+        if(coupen && coupen.type == 0){
+            coupenId = coupen._id;
+            if(coupen.active && coupen.noOfRedeems){
+                discount = coupen.discount;
+                isCoupen = true;
+                msg = "Discount applied successfully."
+            }else{
+                msg = "Coupen has expired."
+            }
+        }else{
+            msg = "Coupen Code is not valid."
+        }
+        res.status(200).json({
+            isCoupen,
+            coupenId,
+            discount,
+            message : msg,
+            success : true
+        })
+    }
+    catch(err){
+        res.status(500).json({
+            message : err.message,
+            success : false
+        })
+    }
+}

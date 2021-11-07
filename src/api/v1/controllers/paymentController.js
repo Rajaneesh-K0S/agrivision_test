@@ -131,8 +131,16 @@ module.exports.success = async (req, res) => {
                 val -= 1;
                 coupen.generatedUsers.set(generatorId, val);
                 await coupen.save();
-            }else{
+            }else if(arr[0] == 0){
                 coupen.generatedUsers.delete(generatorId);
+                await coupen.save();
+            }else if(arr[0] == 2){
+                let val = coupen.noOfRedeems;
+                val -= 1;
+                coupen.noOfRedeems = val;
+                if(val == 0){
+                    coupen.active = false;
+                }
                 await coupen.save();
             }
         }
