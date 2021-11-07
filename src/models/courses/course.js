@@ -13,8 +13,8 @@ const reviewSchema = new Schema({
 
 const courseSchema = new Schema({
     name:String,
-    exam:String,
-    subject:String,
+    exam:[String],
+    subject:[String],
     bigImage:String,
     smallImage:String,
     duration:Number,
@@ -50,7 +50,7 @@ const courseSchema = new Schema({
 
 const packageSchema = new Schema({
     name:String,
-    exam:String,
+    exam:[String],
     subject:[String],
     bigImage:String,
     smallImage:String,
