@@ -18,6 +18,7 @@ module.exports.getAllPackages = async(req,res)=>{
                 packageId: element._id,
                 name: element.name,
                 image: element.bigImage,
+                type: element.type,
                 duration: element.duration,
                 testNumber: element.testNumber,
                 videosNumber: element.videosNumber,
@@ -67,6 +68,7 @@ module.exports.packageById = async(req,res)=>{
             let packageData = {};
             packageData['packageId'] = package._id;
             packageData['name'] = package.name;
+            packageData['type'] = package.type;
             packageData['price'] = package.price;
             packageData['courses'] = package.courses;
             packageData['testSeries'] = package.testSeries;
