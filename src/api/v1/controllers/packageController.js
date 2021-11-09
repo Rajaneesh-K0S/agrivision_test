@@ -23,7 +23,8 @@ module.exports.getAllPackages = async(req,res)=>{
                 testNumber: element.testNumber,
                 videosNumber: element.videosNumber,
                 courses: element.courses,
-                testSeries: element.testSeries
+                testSeries: element.testSeries,
+                includes: element.includes
             });
         });
 
@@ -73,6 +74,7 @@ module.exports.packageById = async(req,res)=>{
             packageData['courses'] = package.courses;
             packageData['testSeries'] = package.testSeries;
             packageData['fullTestCount'] = package.testNumber;
+            packageData['includes'] = package.includes;
             packageData['description'] = package.description;
             packageData['rating'] = package.rating;
             packageData['highlights'] = package.highlights;
