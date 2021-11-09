@@ -20,7 +20,8 @@ module.exports.allCourse = async function (req, res) {
                 image: element.bigImage,
                 duration: element.duration,
                 chapters: element.chapters,
-                fullTests: element.fullTests
+                fullTests: element.fullTests,
+                includes: element.includes
             });
         });
 
@@ -96,6 +97,7 @@ module.exports.courseById = async function (req, res) {
             courseData['description'] = course.description;
             courseData['rating'] = course.rating;
             courseData['highlights'] = course.highlights;
+            courseData['includes'] = course.includes;
             courseData['feedbacks'] = course.feedbacks;
             courseData['ratingPercentages'] = ratingsCount;
             courseData['similarCourses'] = similarCourseData;
