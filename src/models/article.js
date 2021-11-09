@@ -53,6 +53,10 @@ const articleSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isApproved:{                     // an article will only appear if it is approved by the editor.
+        type : Boolean,
+        default: false
+    },
     content: String,
     comments:[articleCommentsSchema]
 
@@ -67,7 +71,7 @@ let storage = multer.diskStorage({
        cb(null, path.join(__dirname, '..','/..', ARTICLE_PATH));
      },
      filename: function (req, file, cb) {
-       cb(null, file.fieldname + '-' + Date.now());
+       cb(null, Date.now() + '-' + file.originalname);
      }
 });
 

@@ -68,6 +68,10 @@ const userSchema = new Schema({
     randString: {
         type: String
     },
+    articlesRemaining: {
+        type : Number,
+        default : 0
+    },
     courses:[{
         type: Schema.Types.ObjectId,
         ref: 'Course'
