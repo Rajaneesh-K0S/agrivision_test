@@ -19,6 +19,9 @@ let testSeriesSchema = new Schema({
     highlights:[{
         type:String
     }],
+    includes:[{
+        type: String
+    }],
     feedbacks:[{
         type : Schema.Types.ObjectId,
         ref : 'Review'
