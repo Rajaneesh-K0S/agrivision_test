@@ -100,17 +100,17 @@ module.exports.articleSubmission = function (req, res) {
           heading : req.body.heading
         })
         await article.save();
-        let html = `Author Name : ${user.name[0]+user.name[1]}<br>Article ID : ${article._id}`
-        let mailOptions = {
-          from: process.env.SMTP_EMAIL,
-          to: process.env.EDITOR_EMAIL,
-          subject: `Article for review`,
-          html: html,
-          attachments: [{
-            filename: req.file.filename,
-            path: req.file.path
-          }]
-        };
+        // let html = `Author Name : ${user.name[0]+user.name[1]}<br>Article ID : ${article._id}`
+        // let mailOptions = {
+        //   from: process.env.SMTP_EMAIL,
+        //   to: process.env.EDITOR_EMAIL,
+        //   subject: `Article for review`,
+        //   html: html,
+        //   attachments: [{
+        //     filename: req.file.filename,
+        //     path: req.file.path
+        //   }]
+        // };
         // await transporter.sendMail(mailOptions);
         user.articlesRemaining -= 1;
         await user.save();
