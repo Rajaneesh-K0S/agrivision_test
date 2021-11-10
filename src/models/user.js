@@ -103,9 +103,11 @@ const userSchema = new Schema({
             type:Date,
             default:Date.now
         },
-        type:Number,
-        default:0
-    }],
+        duration: {
+            type: Number,
+            default: 0
+        }
+    }], 
     minutesGoal:{
         type:Number,
         default:60
