@@ -18,6 +18,8 @@ module.exports.allTestSeries = async function (req, res) {
                 testSeriesId: element._id,
                 name: element.name,
                 image: element.bigImage,
+                includes: element.includes,
+                isPublic: element.isPublic
             });
         });
 
@@ -72,6 +74,7 @@ module.exports.testSeriesById = async function (req, res) {
                 });
                 let testSeriesData = {};
                 testSeriesData['testSeriesId'] = testSeries._id;
+                testSeriesData['isPublic'] = testSeries.isPublic;
                 testSeriesData['name'] = testSeries.name;
                 testSeriesData['price'] = testSeries.price;
                 testSeriesData['description'] = testSeries.description;

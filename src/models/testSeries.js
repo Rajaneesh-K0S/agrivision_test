@@ -12,6 +12,7 @@ let testSeriesSchema = new Schema({
     rating : Number,
     description : String,
     userEnrolled : Number,
+    isPublic: Boolean,
     quizzes : [{
         type : Schema.Types.ObjectId,
         ref : 'Quiz'
