@@ -44,7 +44,7 @@ module.exports.addComment = async function (req, res) {
     const article = await Article.findById(req.params.id);
     const comment = {
       comment: req.body.comment,
-      user: req.user.name
+      user: req.user.name[0] + ' ' + req.user.name[1]
     };
     article.comments.push(comment);
     await article.save();
