@@ -27,7 +27,8 @@ module.exports.getAllPackages = async(req,res)=>{
                 includes: element.includes,
                 description: element.description,
                 highlights: element.highlights,
-                price: element.price
+                price: element.price,
+                rating: element.rating
             });
         });
 
