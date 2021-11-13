@@ -56,6 +56,7 @@ const packageSchema = new Schema({
     exam:[String],
     subject:[String],
     type: Number,        // 0 for MEGA, 1 for MICRO, 2 for NANO, 3 for CRASH, 4 for NUCLEUS
+    optionalSubject: String,
     bigImage:String,
     smallImage:String,
     duration:{

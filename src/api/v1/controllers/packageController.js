@@ -24,7 +24,10 @@ module.exports.getAllPackages = async(req,res)=>{
                 videosNumber: element.videosNumber,
                 courses: element.courses,
                 testSeries: element.testSeries,
-                includes: element.includes
+                includes: element.includes,
+                description: element.description,
+                highlights: element.highlights,
+                price: element.price
             });
         });
 
