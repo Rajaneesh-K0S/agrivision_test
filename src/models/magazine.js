@@ -4,7 +4,15 @@ const magazineSchema = new mongoose.Schema({
     url:{
         type:String
     },
-    type:{
+    month:{
+        type:Number,
+        min: 1,
+        max: 12
+    },
+    bigImage:{
+        type:String
+    },
+    smallImage:{
         type:String
     }
 }, {
