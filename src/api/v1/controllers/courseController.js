@@ -17,11 +17,17 @@ module.exports.allCourse = async function (req, res) {
             data.push({
                 courseId: element._id,
                 name: element.name,
+                subject: element.subject,
+                exam:element.exam,
                 image: element.bigImage,
                 duration: element.duration,
                 chapters: element.chapters,
                 fullTests: element.fullTests,
-                includes: element.includes
+                includes: element.includes,
+                rating: element.rating,
+                price: element.price,
+                originalPrice: element.originalPrice,
+                highlights: element.highlights
             });
         });
 

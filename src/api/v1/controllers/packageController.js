@@ -28,7 +28,8 @@ module.exports.getAllPackages = async(req,res)=>{
                 description: element.description,
                 highlights: element.highlights,
                 price: element.price,
-                rating: element.rating
+                rating: element.rating,
+                originalPrice: element.originalPrice
             });
         });
 

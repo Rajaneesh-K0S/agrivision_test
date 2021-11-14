@@ -21,6 +21,7 @@ const courseSchema = new Schema({
     userEnrolled:Number,
     rating:Number,  //total course rating
     price:Number,
+    originalPrice:Number,
     description:String,
     highlights:[{
         type:String
@@ -80,6 +81,7 @@ const packageSchema = new Schema({
         default:4.5
     },  //total course rating
     price:Number,
+    originalPrice:Number,
     description:String,
     highlights:[{
         type:String
