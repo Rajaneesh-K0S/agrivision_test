@@ -18,6 +18,7 @@ module.exports.getAllPackages = async(req,res)=>{
                 packageId: element._id,
                 name: element.name,
                 image: element.bigImage,
+                smallImage: element.smallImage,
                 type: element.type,
                 duration: element.duration,
                 testNumber: element.testNumber,
