@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const {Schema} =mongoose;
-const multer = require('multer');
- const path = require('path');
-const ARTICLE_PATH = path.join('/uploads/articles');
+// const multer = require('multer');
+// const path = require('path');
+// const ARTICLE_PATH = path.join('/uploads/articles');
 
 
 
@@ -66,17 +66,17 @@ const articleSchema = new mongoose.Schema({
 
 
 
-let storage = multer.diskStorage({
-     destination: function (req, file, cb) {
-       cb(null, path.join(__dirname, '..','/..', ARTICLE_PATH));
-     },
-     filename: function (req, file, cb) {
-       cb(null, Date.now() + '-' + file.originalname);
-     }
-});
+// let storage = multer.diskStorage({
+//      destination: function (req, file, cb) {
+//        cb(null, path.join(__dirname, '..','/..', ARTICLE_PATH));
+//      },
+//      filename: function (req, file, cb) {
+//        cb(null, Date.now() + '-' + file.originalname);
+//      }
+// });
 
-articleSchema.statics.upload = multer({storage:storage}).single('article_file');
-articleSchema.statics.avatarPath = ARTICLE_PATH;
+// articleSchema.statics.upload = multer({storage:storage}).single('article_file');
+// articleSchema.statics.avatarPath = ARTICLE_PATH;
 
 
 const Article = mongoose.model('Article', articleSchema);

@@ -24,5 +24,19 @@ let uploadImg = multer({
 });
 
 
+let articleUpload = multer({
+    storage: multerS3({
+        s3: S3,
+        bucket: process.env.bucketName,
+        acl : 'public-read',
+        metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key : function (req, file, cb) {
+            cb(null,  'tmp_articles/' + Date.now() + file.originalname);
+        }
+    })
+});
 
-module.exports = { uploadImg };
+
+module.exports = { uploadImg, articleUpload };
