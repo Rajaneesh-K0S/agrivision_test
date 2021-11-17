@@ -24,3 +24,8 @@ module.exports.generateToken = (user) => {
 
 };
 
+module.exports.generateRandomToken = (str) => {
+    const token = jwt.sign({ article: str }, process.env.JWT_SECRET);
+    return token;
+};
+

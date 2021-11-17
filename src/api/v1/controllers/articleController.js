@@ -95,23 +95,28 @@ module.exports.articleSubmission = function (req, res) {
       let user = await User.findById(userId);
 
       if (user.articlesRemaining) {
+        user.institute = req.body.institute;
+        user.department = req.body.department;
+        user.designation = req.body.designation;
+        user.contactNo = req.body.contactNo;
+        user.linkedinProfile = req.body.linkedinProfile;
+        user.address = req.body.address;
         let article = new Article({
           author : userId,
           heading : req.body.heading
         })
         await article.save();
-        // let html = `Author Name : ${user.name[0]+user.name[1]}<br>Article ID : ${article._id}`
-        // let mailOptions = {
-        //   from: process.env.SMTP_EMAIL,
-        //   to: process.env.EDITOR_EMAIL,
-        //   subject: `Article for review`,
-        //   html: html,
-        //   attachments: [{
-        //     filename: req.file.filename,
-        //     path: req.file.path
-        //   }]
-        // };
-        // await transporter.sendMail(mailOptions);
+        let html = `Author Name : ${user.name[0]+user.name[1]}<br>Article ID : ${article._id}`
+        let mailOptions = {
+          from: process.env.SMTP_EMAIL,
+          to: process.env.EDITOR_EMAIL,
+          subject: `Article for review`,
+          html: html,
+          attachments: [{
+            path: req.file.path
+          }]
+        };
+        await transporter.sendMail(mailOptions);
         user.articlesRemaining -= 1;
         await user.save();
         return res.status(200).json({
@@ -135,7 +140,8 @@ module.exports.articleSubmission = function (req, res) {
         message: "redirect for payment",
         data: {
           articleHeading: req.body.heading,
-          articleFilePath: req.file.path
+          articleFilePath: req.file.path,
+          subscriptionType: req.body.subscriptionType
         },
         success: true
       })
