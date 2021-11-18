@@ -323,50 +323,45 @@ module.exports.addToCart = async(req, res)=>{
     let packageId = req.body.packageId
     try{
         //let user = await User.findById(userId);
+        let user = await User.findOne({_id : userId}, {"cart" : 1});
         if(courseId){
             // user.cart.courses.push(courseId);
             // await user.save();
-            if(req.user.cart.courses.includes(courseId)){
-            res.status(200).json({
-                message : 'Item already in cart.',
-                success : false
-            })
+            let success = true;
+            if(user.cart.courses.includes(courseId)){
+                success = false;
             }
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.courses' : courseId   }});
             res.status(300).json({
                 message : 'successfully added course in cart',
-                success : true
+                success 
             });
         }
         else if(testSeriesId){
-            if(req.user.cart.testSeries.includes(testSeriesId)){
-            res.status(200).json({
-                message : 'Item already in cart.',
-                success : false
-            })
+            let success = true;
+            if(user.cart.testSeries.includes(testSeriesId)){
+               success = false;
             }
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.testSeries' : testSeriesId   }});
             res.status(300).json({
                 message : 'successfully added test series in cart',
-                success : true
+                success 
             });
         }
         else if(packageId){
-            if(req.user.cart.packages.includes(packageId)){
-            res.status(200).json({
-                message : 'Item already in cart.',
-                success : false
-            })
+            let success = true;
+            if(user.cart.packages.includes(packageId)){
+               success = false;
             }
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.packages' : packageId   }});
             res.status(300).json({
-                message : 'successfully added test series in cart',
-                success : true
+                message : 'successfully added package in cart',
+                success 
             });
         }
     }
     catch(error){
-        res.status(400).json({
+        res.status(500).json({
             message : error.message,
             success : false
         });
