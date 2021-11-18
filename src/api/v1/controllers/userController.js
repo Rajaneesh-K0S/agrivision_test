@@ -330,8 +330,9 @@ module.exports.addToCart = async(req, res)=>{
             let success = true;
             if(user.cart.courses.includes(courseId)){
                 success = false;
-            }
+            }else{
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.courses' : courseId   }});
+            }
             res.status(300).json({
                 message : 'successfully added course in cart',
                 success 
@@ -341,8 +342,9 @@ module.exports.addToCart = async(req, res)=>{
             let success = true;
             if(user.cart.testSeries.includes(testSeriesId)){
                success = false;
-            }
+            }else{
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.testSeries' : testSeriesId   }});
+            }
             res.status(300).json({
                 message : 'successfully added test series in cart',
                 success 
@@ -352,8 +354,9 @@ module.exports.addToCart = async(req, res)=>{
             let success = true;
             if(user.cart.packages.includes(packageId)){
                success = false;
-            }
+            }else{
             await User.updateOne({ _id : userId }, { '$push' :  { 'cart.packages' : packageId   }});
+            }
             res.status(300).json({
                 message : 'successfully added package in cart',
                 success 
