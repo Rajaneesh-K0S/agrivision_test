@@ -5,7 +5,7 @@ let markedAnsData = async (quizId, userId) => {
     let marked = await Rank.findOne({ quizId, userId }, { markedAns: 1 });
     if (marked) {
         let markedAnswers = marked.markedAns;
-        let allQuestions = await Question.find({ quizId }, { 'topic': 1, 'correctAnswer': 1, 'marking': 1, 'negMarking': 1 });
+        let allQuestions = await Question.find({ quizId }, { 'topic': 1, 'correctAnswer': 1, 'marking': 1, 'negMarking': 1, 'questionType': 1 });
         return { markedAnswers, allQuestions };
     } else {
         throw new Error("User did not attempt the quiz.");
@@ -24,12 +24,20 @@ let calculateRank = (markedAnswers, allQuestions) => {
     allQuestions.forEach(ques => {
         if (markedAnswers.has(ques._id.toString())) {
             let markedAnsArray = markedAnswers.get(ques._id.toString());
+            let correctAnsArray = ques.correctAnswer;
+            let isCorrect = false;
             if (ques.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
+            }else if(ques.questionType == 2 && correctAnsArray.length == 2){
+                markedAnsArray.forEach(markedAns=>{
+                    if(markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]){
+                        isCorrect = true;
+                    }
+                })
             }
             let markedAnsString = markedAnsArray.sort().join(',');
             let correctAnsString = ques.correctAnswer.sort().join(',');
-            if (markedAnsString == correctAnsString) {
+            if (isCorrect || (markedAnsString == correctAnsString)) {
                 obj['totalCorrect']++;
                 obj['positiveMarks'] += ques.marking;
                 obj['totalScore'] += ques.marking;
@@ -90,12 +98,20 @@ let findAnalysisByTopic = async (markedAnswers, allQuestions) => {
         if (markedAnswers.has(question._id.toString())) {
             obj['attempted']++;
             let markedAnsArray = markedAnswers.get(question._id.toString());
+            let correctAnsArray = question.correctAnswer;
+            let isCorrect = false;
             if (question.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
+            }else if(question.questionType == 2 && correctAnsArray.length == 2){
+                markedAnsArray.forEach(markedAns=>{
+                    if(markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]){
+                        isCorrect = true;
+                    }
+                })
             }
             let markedAnsString = markedAnsArray.sort().join(',');
             let correctAnsString = question.correctAnswer.sort().join(',');
-            if (markedAnsString == correctAnsString) {
+            if (isCorrect || (markedAnsString == correctAnsString)) {
                 obj['correct']++;
                 obj['score'] += question.marking;
             }
@@ -363,12 +379,20 @@ module.exports.getAnalysis = async (req, res) => {
                         let question = sections[i].questions[j];
                         if (markedAnswers.has(question._id.toString())) {
                             let markedAnsArray = markedAnswers.get(question._id.toString());
+                            let correctAnsArray = question.correctAnswer;
+                            let isCorrect = false;
                             if (question.questionType != 2) {
                                 markedAnsArray = markedAnsArray.map(v => v + 1);
+                            }else if(question.questionType == 2 && correctAnsArray.length == 2){
+                                markedAnsArray.forEach(markedAns=>{
+                                    if(markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]){
+                                        isCorrect = true;
+                                    }
+                                })
                             }
                             let markedAnsString = markedAnsArray.sort().join(',');
                             let correctAnsString = question.correctAnswer.sort().join(',');
-                            if (markedAnsString == correctAnsString) {
+                            if (isCorrect || (markedAnsString == correctAnsString)) {
                                 quiz.sections[i].questions[j]['status'] = 1;
                                 quiz.sections[i].questions[j]['markedAns'] = markedAnsArray;
                             }
