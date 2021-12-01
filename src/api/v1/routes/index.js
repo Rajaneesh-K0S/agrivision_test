@@ -12,7 +12,7 @@ router.use('/course', require('./course'));
 router.use('/package',require('./package'));
 router.use('/jobs',  require('./job'));
 router.use('/testseries', require('./testSeries'));
-
+router.use('/chatbot', require('./chatbot'));
 router.use('/payment', require('./payment'));
 router.use('/article',require('./article'));
 router.use('/coupens', require('./coupen'));
