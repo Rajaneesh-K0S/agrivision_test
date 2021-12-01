@@ -52,6 +52,17 @@ const courseSchema = new Schema({
     }
 });
 
+const packageCategoriesSchema = new Schema({
+    name : String,
+    packages : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Package'
+    }],
+    exam : [String],
+    subject : [String],
+    sortOrder : Number                  // for sorting the categories.
+})
+
 const packageSchema = new Schema({
     name:String,
     exam:[String],
@@ -115,5 +126,6 @@ const packageSchema = new Schema({
 const Course = mongoose.model('Course', courseSchema);
 const Review = mongoose.model('Review', reviewSchema);
 const Package = mongoose.model('Package',packageSchema)
-module.exports = { Course, Review, Package };
+const PackageCategory = mongoose.model('PackageCategory', packageCategoriesSchema);
+module.exports = { Course, Review, Package, PackageCategory};
 
