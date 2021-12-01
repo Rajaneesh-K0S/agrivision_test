@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const quizTableSchema = new Schema({
     name : String,
     live : Boolean,
+    quizStartDate : Date,
     isPublic: {
         type:Boolean,
         default:false
@@ -22,7 +23,7 @@ const quizTableSchema = new Schema({
     totalNoQuestions : Number,
     maxScore : Number,
     exam: String,
-    subject:String,
+    subject:String,                  // similar to chapter in courses.
     calculator : Boolean,
     totalTime : Number,
     startTime : Number,

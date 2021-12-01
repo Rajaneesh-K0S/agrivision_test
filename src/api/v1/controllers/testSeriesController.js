@@ -1,4 +1,6 @@
-const { TestSeries, User } = require('../../../models');
+const { TestSeries, Subject, User } = require('../../../models');
+
+
 
 
 module.exports.allTestSeries = async function (req, res) {
@@ -42,11 +44,28 @@ module.exports.testSeriesById = async function (req, res) {
     try {
         if (req.query.queryParam == 0) {
 
-            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({ path: 'quizzes', select : "name Poster"});
+            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({path : 'subjects', populate : {path: 'quizzes', select : "name "}});
             res.status(200).json({
                 isSbuscribed : req.body.isSubscribed,
                 message: 'test series fetched',
                 data: testSeries,
+                success: true
+            });
+        }
+
+        else if (req.query.queryParam == 2) {
+            let subjectId = req.query.subjectID;
+            let testSeries = await TestSeries.find({ _id: testSeriesId }, { 'name': 1 });
+            let allSubjects = await Subject.find({}, { 'name' : 1 });
+            let subject = await Subject.findById(subjectId).populate({ path: 'quizzes', select : "name Poster quizStartDate subject syllabus" });
+            subject = subject.toJSON();
+            subject.quizzes.forEach(quiz=> {
+                let date = new Date(quiz.quizStartDate);
+                quiz.quizStartDate = date.getTime();
+            })
+            res.status(200).json({
+                message: 'subject fetched',
+                data: { testSeries, allSubjects, subject },
                 success: true
             });
         }

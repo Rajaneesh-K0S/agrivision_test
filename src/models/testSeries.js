@@ -2,6 +2,14 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+let subjectSchema = new Schema({
+    name : String,
+    quizzes : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Quiz'
+    }]
+})
+
 let testSeriesSchema = new Schema({
     name : String,
     bigImage : String,
@@ -13,6 +21,10 @@ let testSeriesSchema = new Schema({
     description : String,
     userEnrolled : Number,
     isPublic: Boolean,
+    subjects : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Subject'
+    }],
     quizzes : [{
         type : Schema.Types.ObjectId,
         ref : 'Quiz'
@@ -39,7 +51,8 @@ let testSeriesSchema = new Schema({
 })
 
 let TestSeries = mongoose.model('TestSeries', testSeriesSchema);
+let Subject = mongoose.model('Subject', subjectSchema);
 
 
-module.exports = TestSeries;
+module.exports = {TestSeries, Subject};
 

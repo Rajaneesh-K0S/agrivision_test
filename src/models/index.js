@@ -25,7 +25,9 @@ module.exports.Jobs = require('./job');
 module.exports.College = require('./academic');
 
 
-module.exports.TestSeries = require('./testSeries');
+let exportedTestSeriesObject = require('./testSeries');
+module.exports.TestSeries = exportedTestSeriesObject.TestSeries;
+module.exports.Subject = exportedTestSeriesObject.Subject;
 
 module.exports.Quiz = require('./quiz/quiz');
 module.exports.Question = require('./quiz/question');
