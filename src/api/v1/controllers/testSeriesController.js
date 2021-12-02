@@ -43,8 +43,18 @@ module.exports.testSeriesById = async function (req, res) {
     let testSeriesId = req.params.id;
     try {
         if (req.query.queryParam == 0) {
-
-            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({path : 'subjects', populate : {path: 'quizzes', select : "name "}});
+            let category = req.query.category;
+            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({path: 'quizzes', select : "name category Poster quizStartDate syllabus"});;
+            if(category){
+                let categoryWiseQuizzes = testSeries.quizzes.filter(quiz=> quiz.category == category);
+                testSeries.quizzes = categoryWiseQuizzes;
+            }
+            testSeries = testSeries.toJSON();
+            testSeries.quizzes.forEach(quiz=>{
+                let date = new Date(quiz.quizStartDate);
+                quiz.quizStartDate = date.getTime();
+            })
+           
             res.status(200).json({
                 isSbuscribed : req.body.isSubscribed,
                 message: 'test series fetched',
@@ -53,22 +63,6 @@ module.exports.testSeriesById = async function (req, res) {
             });
         }
 
-        else if (req.query.queryParam == 2) {
-            let subjectId = req.query.subjectID;
-            let testSeries = await TestSeries.find({ _id: testSeriesId }, { 'name': 1 });
-            let allSubjects = await Subject.find({}, { 'name' : 1 });
-            let subject = await Subject.findById(subjectId).populate({ path: 'quizzes', select : "name Poster quizStartDate subject syllabus" });
-            subject = subject.toJSON();
-            subject.quizzes.forEach(quiz=> {
-                let date = new Date(quiz.quizStartDate);
-                quiz.quizStartDate = date.getTime();
-            })
-            res.status(200).json({
-                message: 'subject fetched',
-                data: { testSeries, allSubjects, subject },
-                success: true
-            });
-        }
         
         // queryParam = 1 for payment page for a specific test series
         else if(req.query.queryParam == 1){
