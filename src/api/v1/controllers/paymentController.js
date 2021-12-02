@@ -1,26 +1,97 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { User, Package, Coupen, Article } = require('../../../models');
+const { User, Course, TestSeries, Package, Coupen, Article } = require('../../../models');
 const { generateRandomToken } = require('../../../utils/index');
 const transporter = require('../../../config/nodemailer');
 
+let returnIndividualPrice = async (item, type)=>{
+    try{
+        let price = 0;
+        if(type == 0){
+            let course = await Course.findOne({_id : item}, {"price" : 1});
+            price += course.price;
+        }
+        else if(type == 1){
+            let testSeries = await TestSeries.findOne({_id : item}, {"price" : 1});
+            price += testSeries.price;
+        }
+        else if(type == 2){
+            let package = await Package.findOne({_id : item}, {"price" : 1});
+            price += package.price;
+        }
+        else if(type == 3){
+            let subscription = item.subscription;
+            let profession = item.profession;
+            if (subscription == "single") {
+                if (profession == 0)
+                    price += 100;
+                else if (profession == 1)
+                    price += 125;
+                else if (profession == 2)
+                    price += 150;
+            }
+            else{
+                if (profession == 0)
+                    price += 250;
+                else if (profession == 1)
+                    price += 450;
+                else if (profession == 2)
+                    price += 500;
+            }
+        }
+        return price;
+    }
+    catch(err){
+        throw err;
+    }
+}
 
+let calculatePaymentAmount = async (entities) =>{
+    try{
+        let entityLength = entities.length;
+        let totalAmount = 0;
+        for(let i =0;i< entityLength;i++){
+            let entity = entities[i];
+            if(entity.type == 3){
+                totalAmount += await returnIndividualPrice(entity.item, entity.type);
+            }else{
+                if(entity.itemIds){
+                    let itemsLength = entity.itemIds.length;
+                    for(let j =0; j<itemsLength; j++){
+                        let item = entity.itemIds[j];
+                        totalAmount += await returnIndividualPrice(item, entity.type);
+                    }
+                }
+            }
+        }
+        return totalAmount;
+    }
+    catch(err){
+        throw err;
+    }
+}
 
 
 module.exports.order = async (req, res) => {
-    let userId = req.user._id.toString();
-    let { courseIds, testSeriesIds, packageIds, origin, shareAndEarn, articlePayment } = req.body;
-    let courseIdString = "", testSeriesIdString = "", packageIdString = "", shareAndEarnString = "", articleString = "", articleSubscriptionType = "";
-    if (shareAndEarn) {
-        shareAndEarnString = shareAndEarn.case.toString() + '$' + shareAndEarn.generator.toString() + '$' + shareAndEarn.coupenId.toString();
-    }
-    if (articlePayment) {
-        articleString = articlePayment.articleFilePath.toString();
-        articleSubscriptionType = articlePayment.subscriptionType
-    }
-    articleString = generateRandomToken(articleString);
+
     try {
+        let userId = req.user._id.toString();
+        let { courseIds, testSeriesIds, packageIds, origin, shareAndEarn, articlePayment } = req.body;
+        let courseIdString = "", testSeriesIdString = "", packageIdString = "", shareAndEarnString = "", articleString = "", articleSubscriptionType = "";
+        let paymentAmount = 0;
+        let entities = [{itemIds : courseIds, type : 0}, {itemIds : testSeriesIds, type :1}, {itemIds : packageIds, type :2 }];
+        if (articlePayment) {
+            articleString = articlePayment.articleFilePath.toString();
+            articleSubscriptionType = articlePayment.subscriptionType;
+            articleString = generateRandomToken(articleString);
+            entities.push({item : {subscription : articlePayment.subscriptionType, profession : articlePayment.profession}, type : 3});
+        }
+        paymentAmount += await calculatePaymentAmount(entities);
+        
+        if (shareAndEarn) {
+            shareAndEarnString = shareAndEarn.case.toString() + '$' + shareAndEarn.generator.toString() + '$' + shareAndEarn.coupenId.toString();
+        }
         if (courseIds && courseIds.length) {
             courseIdString = courseIds.join('$');
         }
@@ -36,7 +107,7 @@ module.exports.order = async (req, res) => {
         });
 
         const options = {
-            amount: req.params.amount * 100,
+            amount: paymentAmount * 100,
             currency: 'INR',
             receipt: 'receipt_order_',
             notes: {
@@ -65,6 +136,7 @@ module.exports.order = async (req, res) => {
             success: true
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             message: error.message,
             success: false

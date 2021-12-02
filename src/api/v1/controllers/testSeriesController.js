@@ -43,6 +43,7 @@ module.exports.testSeriesById = async function (req, res) {
     let testSeriesId = req.params.id;
     try {
         if (req.query.queryParam == 0) {
+
             let category = req.query.category;
             let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({path: 'quizzes', select : "name category Poster quizStartDate syllabus"});;
             if(category){
@@ -55,6 +56,7 @@ module.exports.testSeriesById = async function (req, res) {
                 quiz.quizStartDate = date.getTime();
             })
            
+
             res.status(200).json({
                 isSbuscribed : req.body.isSubscribed,
                 message: 'test series fetched',
