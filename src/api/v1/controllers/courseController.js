@@ -5,12 +5,12 @@ module.exports.allCourse = async function (req, res) {
     try {
         let courses;
         if(req.query.exam){
-            courses = await Course.find({ 'exam':req.query.exam });
+            courses = await Course.find({ 'exam':req.query.exam, 'show': true });
         }
         else if (req.query.subject) {
-            courses = await Course.find({ 'subject':req.query.subject });
+            courses = await Course.find({ 'subject':req.query.subject, 'show': true });
         } else {
-            courses = await Course.find({});
+            courses = await Course.find({'show': true});
         }
         let data = [];
         courses.forEach(element => {

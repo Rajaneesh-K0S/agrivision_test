@@ -5,13 +5,13 @@ module.exports.getAllPackages = async(req,res)=>{
     try {
         let packages;
         if(req.query.exam){
-            packages = await PackageCategory.find({'exam' : req.query.exam}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
+            packages = await PackageCategory.find({'exam' : req.query.exam, 'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
         }
         else if (req.query.subject) {
-            packages = await PackageCategory.find({'subject' : req.query.subject}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
+            packages = await PackageCategory.find({'subject' : req.query.subject, 'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
 
         } else {
-            packages = await PackageCategory.find({}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
+            packages = await PackageCategory.find({'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
         }
         packages.forEach((element, i) => {
             element = element.toJSON();

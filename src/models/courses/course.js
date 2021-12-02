@@ -15,6 +15,7 @@ const courseSchema = new Schema({
     name:String,
     exam:[String],
     subject:[String],
+    show : Boolean,         // to show or hide a course 
     bigImage:String,
     smallImage:String,
     duration:Number,
@@ -60,6 +61,7 @@ const packageCategoriesSchema = new Schema({
     }],
     exam : [String],
     subject : [String],
+    show : Boolean,                     // to show or hide a package category
     sortOrder : Number                  // for sorting the categories.
 })
 
@@ -67,6 +69,7 @@ const packageSchema = new Schema({
     name:String,
     exam:[String],
     subject:[String],
+    show : Boolean,                     // to show or hide a package
     type: Number,        // 0 for MEGA, 1 for MICRO, 2 for NANO, 3 for CRASH, 4 for NUCLEUS
     optionalSubject: String,
     bigImage:String,

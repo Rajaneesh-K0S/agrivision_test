@@ -7,12 +7,12 @@ module.exports.allTestSeries = async function (req, res) {
     try {
         let testSeries;
         if(req.query.exam){
-            testSeries = await TestSeries.find({ 'exam':req.query.exam });
+            testSeries = await TestSeries.find({ 'exam':req.query.exam, 'show' : true });
         }
         else if (req.query.subject) {
-            testSeries = await TestSeries.find({ 'subject':req.query.subject });
+            testSeries = await TestSeries.find({ 'subject':req.query.subject, 'show' : true });
         } else {
-            testSeries = await TestSeries.find({});
+            testSeries = await TestSeries.find({'show' : true });
         }
         let data = [];
         testSeries.forEach(element => {

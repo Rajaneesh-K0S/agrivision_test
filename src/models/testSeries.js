@@ -21,6 +21,7 @@ let testSeriesSchema = new Schema({
     description : String,
     userEnrolled : Number,
     isPublic: Boolean,
+    show : Boolean,                     // to show or hide a test series
     subjects : [{
         type : Schema.Types.ObjectId,
         ref : 'Subject'
