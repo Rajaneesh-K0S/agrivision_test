@@ -64,6 +64,16 @@ let calculatePaymentAmount = async (entities) =>{
                     }
                 }
             }
+            if(entity.type == 4){
+                let coupen = await Coupen.findOne({_id : entity.item.coupenId}, {"discount" : 1, "generatorDiscount" : 1, "receiverDiscount" : 1});
+                if(entity.item.case == 0){
+                    totalAmount -= Math.ceil((totalAmount*coupen.generatorDiscount)/100);
+                }else if(entity.item.case == 1){
+                    totalAmount -= Math.ceil((totalAmount*coupen.receiverDiscount)/100);
+                }else if(entity.item.case == 2){
+                    totalAmount -= Math.ceil((totalAmount*coupen.discount)/100);
+                }
+            }
         }
         return totalAmount;
     }
@@ -87,11 +97,13 @@ module.exports.order = async (req, res) => {
             articleString = generateRandomToken(articleString);
             entities.push({item : {subscription : articlePayment.subscriptionType, profession : articlePayment.profession}, type : 3});
         }
-        paymentAmount += await calculatePaymentAmount(entities);
-        
         if (shareAndEarn) {
             shareAndEarnString = shareAndEarn.case.toString() + '$' + shareAndEarn.generator.toString() + '$' + shareAndEarn.coupenId.toString();
+            entities.push({item : shareAndEarn, type : 4});
         }
+
+        paymentAmount += await calculatePaymentAmount(entities);
+        
         if (courseIds && courseIds.length) {
             courseIdString = courseIds.join('$');
         }
