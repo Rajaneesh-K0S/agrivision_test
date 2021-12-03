@@ -177,19 +177,25 @@ module.exports.isSubscribed = async (req, res, next) => {
                     isSubscribed = true;
                 } else {
                     if (quiz.quizType == 1) {
-                        let testSeries = await TestSeries.findOne({ "quizzes": quizId }, { _id: 1 });
-                        if (testSeries) {
-                            let user = await User.findOne({ _id: userId, "testSeries": testSeries._id }, { _id: 1 });
-                            if (user) {
-                                isSubscribed = true;
+                        let testSeries = await TestSeries.find({ "quizzes": quizId }, { _id: 1 });
+                        if (testSeries.length) {
+                            for(let i =0;i<testSeries.length;i++) {
+                                let user = await User.findOne({ _id: userId, "testSeries": testSeries[i]._id }, { _id: 1 });
+                                if (user) {
+                                    isSubscribed = true;
+                                    break;
+                                }
                             }
                         }
                     } else if (quiz.quizType == 2) {
-                        let course = await Course.findOne({ "fullTests": quizId }, { _id: 1 });
-                        if (course) {
-                            let user = await User.findOne({ _id: userId, "courses": course._id }, { _id: 1 });
-                            if (user) {
-                                isSubscribed = true;
+                        let course = await Course.find({ "fullTests": quizId }, { _id: 1 });
+                        if (course.length) {
+                            for(let i =0;i< course.length;i++) {
+                                let user = await User.findOne({ _id: userId, "courses": course[i]._id }, { _id: 1 });
+                                if (user) {
+                                    isSubscribed = true;
+                                    break;
+                                }
                             }
                         }
                     }
