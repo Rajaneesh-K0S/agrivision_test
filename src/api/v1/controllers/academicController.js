@@ -29,10 +29,10 @@ module.exports.showAllColleges = async(req,res)=>{
 module.exports.collegeDetails = async(req,res)=>{
     try{
         const {id} = req.params;
-        const college = await College.findById(id).populate('feedbacks');
+        const college = await College.findById(id).populate({path:'degree',populate:{path:'feedbacks'}});
         res.status(200).json({
             data: college,
-            message:'colleges detais sent',
+            message:'colleges details sent',
             success: true
         })
 
