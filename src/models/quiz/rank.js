@@ -41,6 +41,7 @@ const rank = new Schema({
         type:Number,
         default:0
     },
+    startTime: Number,     // for user specific start time
     totalTime: {
         type:Number,
         default:0

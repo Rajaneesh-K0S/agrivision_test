@@ -227,7 +227,8 @@ module.exports.startQuiz = async (req, res) => {
             let msg = '';
             let rank = await Rank.findOne({ userId, quizId });
             if (!rank) {
-                rank = new Rank({ quizId, userId, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                let startTime = Date.now();
+                rank = new Rank({ quizId, userId, userName: req.user.name, startTime, unattempted: quiz.totalNoQuestions, markedAns: {} });
                 await rank.save();
                 msg = 'quiz was successfully found and sent';
             }else if(!rank.isSubmitted){
@@ -311,10 +312,12 @@ module.exports.submitQuiz = async (req, res) => {
         const quizId = req.params.id;
         const userId = req.user._id;
         // const userId = '616a40b67a5512001682343c';
-        const quiz = await Quiz.findById(quizId);
-        const startTime = quiz.startTime;
-        const finishedTime = Math.min(new Date().getTime(), quiz.endTime);
-        const totalTime = finishedTime - startTime;
+        const quiz = await Quiz.findOne({_id : quizId}, {"totalTime" : 1, "quizType" : 1, "endTime" : 1});
+        const rank = await Rank.findOne({quizId, userId}, {"startTime" : 1});
+        const startTime = rank.startTime;
+        const quizEndTime = (quiz.quizType == 0)?(quiz.endTime):(startTime + quiz.totalTime*60000) ;
+        const finishedTime = Math.min(Date.now(), quizEndTime); 
+        const totalTime = (finishedTime - startTime)/60000;
         await Rank.findOneAndUpdate({ userId, quizId }, { isSubmitted: true, totalTime: totalTime });
         if (quiz.quizType == 1 || quiz.quizType == 2 || quiz.quizType == 3) {
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
@@ -354,9 +357,10 @@ module.exports.getAnalysis = async (req, res) => {
                 let totalCorrectPercentage = (rank.totalCorrect) * 100 / totalQuestions;
                 let totalIncorrectPercentage = (rank.totalIncorrect) * 100 / totalQuestions;
                 let totalSkippedPercentage = (rank.unattempted) * 100 / totalQuestions;
+                let totalAttempted = totalQuestions - rank.unattempted;
                 let totalTimeTaken = rank.totalTime;
                 let totalAllotedTime = quizData.totalTime;
-                let timeSpentPerQuestion = totalTimeTaken / (totalQuestions);
+                let timeSpentPerQuestion = (totalAttempted)?(totalTimeTaken / (totalAttempted)):(totalTimeTaken);
                 let advisedTimePerQuestion = totalAllotedTime / totalQuestions;
 
                 let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
