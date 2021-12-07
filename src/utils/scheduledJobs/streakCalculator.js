@@ -1,19 +1,27 @@
- const CronJob = require('cron').CronJob;
- const { User } = require('../../models');
- var job = new CronJob('* 1 0 * * *', async function() {
-     const user =await User.find({});
-     let date = new Date();
-     date.setDate(date.getDate() - 1);
-     user.forEach(async(user) => {
-         if(user.readingDuration[0]){
-            if(user.readingDuration[user.readingDuration.length - 1].date == date.toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }).split(',')[0]){
-                user.currentStreakDay++;
-            }else{
-                user.currentStreakDay = 0;
-            }
-            user.longestStreakDay = Math.max(user.longestStreakDay, user.currentStreakDay);
-             await user.save();
-         }
-     });
- }, null, true, 'Asia/Kolkata');
- module.exports = job;
+// const CronJob = require('cron').CronJob;
+// const { User } = require('../../models');
+// const {getLocalTimeString} = require('../');
+// var streakCalculatorJob = new CronJob('0 0 1 * * *', async function() {
+//     // console.log("hi everyday 1 am");
+//      const users =await User.find();
+//      let currentDate = getLocalTimeString(new Date());
+//      let previousDate = new Date();
+//      previousDate.setDate(previousDate.getDate() - 1);
+//      previousDate = getLocalTimeString(previousDate);
+//      for(let i =0;i< users.length; i++){
+//         let user = users[i];
+//         let len = user.readingDuration.length
+//         let readingDuration = user.readingDuration;
+//         if(len){
+//             if(readingDuration[len - 1].date == previousDate || readingDuration[len-1].date == currentDate){
+//                 user.currentStreakDay++;
+//             }else{
+//                 user.currentStreakDay = 0;
+//             }
+//             user.longestStreakDay = Math.max(user.longestStreakDay, user.currentStreakDay);
+//             await user.save();
+//         }
+//     }
+// }, null, true, 'Asia/Kolkata');
+
+// module.exports = streakCalculatorJob;

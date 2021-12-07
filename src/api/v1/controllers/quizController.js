@@ -1,5 +1,5 @@
 const { Question, Quiz, Rank, Course, TestSeries, User } = require("../../../models");
-
+const {getLocalTimeString} = require('../../../utils')
 
 let markedAnsData = async (quizId, userId) => {
     let marked = await Rank.findOne({ quizId, userId }, { markedAns: 1 });
@@ -324,6 +324,20 @@ module.exports.submitQuiz = async (req, res) => {
             let rankObj = calculateRank(markedAnswers, allQuestions);
             await Rank.findOneAndUpdate({ userId, quizId }, rankObj);
         }
+        let user = await User.findOne({_id : userId}, {"testDuration" : 1});
+        const date = getLocalTimeString(new Date());
+        let testDuration = user.testDuration[user.testDuration.length - 1];
+        if(!testDuration || !(testDuration.date == date)){
+            user.testDuration.push({
+                date:date,
+                duration:quiz.totalTime,
+                testsCompleted:1
+            });
+        }else{
+            testDuration.duration += quiz.totalTime;
+            testDuration.testsCompleted +=1;
+        }
+        await user.save();
         res.status(200).json({
             message: 'succesfully submitted the quiz',
             success: true

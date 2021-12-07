@@ -1,5 +1,34 @@
 const { Course, Chapter, SubTopic, User } = require('../../../models');
+const {getLocalTimeString} = require('../../../utils');
 
+
+let chapterWiseProgress = async (courseId, chapters, user)=> {
+    const data = user.courseProgress.filter(element => element.courseId == courseId);
+    chapters.forEach(chapter=>{
+        let chapterProg = data.filter(obj => obj.chapterId == chapter._id.toString());
+        chapter['completedSubtopics'] = (chapterProg.length)?(chapterProg[0].subTopics.length):(0);
+    })
+    return chapters;
+}
+
+let subTopicWiseProgress = async (courseId, chapter, user)=> {
+    const data = user.courseProgress.filter(element => element.courseId == courseId);
+    let chapterProg = data.filter(obj => obj.chapterId == chapter._id.toString());
+    chapter.topics.forEach(topic=>{
+        topic.subTopics.forEach(subTopic=>{
+            if(chapterProg.length){
+                if(chapterProg[0].subTopics.includes(subTopic._id)){
+                    subTopic['isCompleted'] = true;
+                }else{
+                    subTopic['isCompleted'] = false;
+                }
+            }else{
+                subTopic['isCompleted'] = false;
+            }
+        })
+    })
+    return chapter;
+}
 
 module.exports.allCourse = async function (req, res) {
     try {
@@ -47,9 +76,12 @@ module.exports.allCourse = async function (req, res) {
 
 module.exports.courseById = async function (req, res) {
     try {
+        let courseId = req.params.id;
         //queryParam = 0 for chapters and topics only(Desktop25 in figma)
         if (req.query.queryParam == 0) {
-            let course = await Course.findById(req.params.id).populate({ path: 'chapters', populate: { path: 'topics', select: 'name' } });
+            let course = await Course.findById(courseId).populate({ path: 'chapters', populate: { path: 'topics', select: 'name totalSubtopics' } });
+            course = course.toJSON();
+            course.chapters = await chapterWiseProgress(courseId, course.chapters, req.user);
             res.status(200).json({
                 message: 'course fetched',
                 data: course,
@@ -60,20 +92,19 @@ module.exports.courseById = async function (req, res) {
         //queryParam = 1 for topic and subtopic list of a specific chapter( Desktop11 in figma). 
         //Also specify anothery query parameter named "chapterID" which contains the id of the required chapter.
         else if (req.query.queryParam == 1) {
-            let courseId = req.params.id;
             let chapterId = req.query.chapterID;
             let course = await Course.find({ _id: courseId }, { 'name': 1 });
-            let allChapters = await Chapter.find({}, { 'name' : 1 });
             let chapter = await Chapter.findById(chapterId).populate({ path: 'topics', populate: { path: 'subTopics', select: 'name' } });
+            chapter = chapter.toJSON();
+            chapter = await subTopicWiseProgress(courseId, chapter, req.user);
             res.status(200).json({
                 message: 'course fetched',
-                data: { course, allChapters, chapter },
+                data: { course, chapter},
                 success: true
             });
         }
         // queryParam = 2 for payment page for a specific course
         else if(req.query.queryParam == 2){
-            let courseId = req.params.id;
             let course = await Course.findById(courseId).populate([{ path : 'feedbacks', populate : { path : 'user', select : 'name image' } }, { path : 'similarCourses', select : 'name userEnrolled image chapters fullTests' }]);
             let ratingsCount = [0, 0, 0, 0, 0];
             let totalRatings = course.feedbacks.length;
@@ -114,8 +145,8 @@ module.exports.courseById = async function (req, res) {
             });
         }
     } catch (error) {
-        res.status(400).json({
-            message: error,
+        res.status(500).json({
+            message: error.message,
             success: false
         });
     }
@@ -168,16 +199,19 @@ module.exports.subTopics = async (req, res) => {
 module.exports.markCompleted = async function(req, res){
     try {
         let courseId = req.params.id;
+        let userId = req.user._id;
         const { subTopicId, chapterId } = req.body;
 
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(userId);
 
         const subTopic = await SubTopic.findById(subTopicId);
         let flag = 0;
         user.courseProgress.forEach(element => {
             if(element.courseId == courseId && element.chapterId == chapterId){
                 flag = 1;
-                element.subTopics.push(subTopicId);                
+                if(!element.subTopics.includes(subTopicId)){
+                    element.subTopics.push(subTopicId);                
+                }
             }
         });
         if(!flag){
@@ -187,12 +221,11 @@ module.exports.markCompleted = async function(req, res){
                 subTopics:[subTopicId]
             });
         }
-        await user.save();
         user.lastCompleted = subTopicId;
         user.totalTimeSpent += subTopic.duration;
-        const date = new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }).split(',')[0];
+        const date = getLocalTimeString(new Date());
         let readingDuration = user.readingDuration[user.readingDuration.length - 1];
-        if(!readingDuration || !readingDuration.date == date){
+        if(!readingDuration || !(readingDuration.date == date)){
             user.readingDuration.push({
                 date:date,
                 duration:subTopic.duration
@@ -215,46 +248,3 @@ module.exports.markCompleted = async function(req, res){
 };
 
 
-module.exports.courseProgress = async function(req, res){
-    try {
-        const courseId = req.params.id;
-        let course = await Course.findOne({ _id : courseId }, { 'totalSubTopics' : 1 });
-        let user = await User.findById(req.user._id);
-        const data = user.courseProgress.filter(element => element.courseId == courseId);
-        if(!data){
-            return res.status(400).json({
-                message : 'invalid id',
-                success : false
-            });
-        }
-        let chapterWiseProgress = [];
-        let totalCompletedSubtopics = 0;
-        for(let i = 0 ;i < data.length ;i++) {
-            totalCompletedSubtopics += data[i].subTopics.length;
-            let chapter = await Chapter.findOne({ _id : data[i].chapterId }, { 'totalSubTopics' : 1 });
-            console.log(chapter);
-            let obj = {};
-            obj['chapterId'] = data[i].chapterId;
-            obj['completedSubtopics'] = data[i].subTopics.length;
-            obj['totalSubtopics'] = chapter.totalSubTopics;
-            console.log(obj);
-            chapterWiseProgress.push(obj);
-        }
-        let courseProgress = {};
-        courseProgress['completedSubtopics'] = totalCompletedSubtopics;
-        courseProgress['totalSubtopics'] = course.totalSubTopics;
-        return res.status(200).json({
-            message : 'successfully fetched course progress',
-            data: { courseProgress, chapterWiseProgress },
-            success:true
-        });
-        
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            message : 'something went wrong',
-            error: error.message,
-            success : false
-        });
-    }
-};

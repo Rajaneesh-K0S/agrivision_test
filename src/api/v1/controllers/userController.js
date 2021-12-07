@@ -73,6 +73,7 @@ module.exports.registerUser = async (req, res) => {
             success: true,
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             error: err.message,
             message: 'something went wrong',
@@ -293,26 +294,7 @@ module.exports.forgotPassword = async function (req, res) {
 };
 
 
-module.exports.addReminder = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        let reminder = {
-            task:req.body.task,
-            date:req.body.date
-        };
-        user.reminder.push(reminder);
-        await user.save();
-        return res.status(200).json({
-            success:true,
-            message:'reminder added successfully'
-        });
-    } catch (error) {
-        return res.status(400).json({
-            success:false,
-            message:'something went wrong'
-        });
-    }
-};
+
 
 
 module.exports.addToCart = async(req, res)=>{
@@ -469,54 +451,26 @@ module.exports.deleteProductInCart = async function (req, res) {
 };
 
 
-module.exports.userProgress = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        const data = {
-            readingDuration:user.readingDuration,
-            testDuration:user.testDuration,
-            minutesGoal:user.minutesGoal,
-            readingGoal:user.readingGoal,
-            currentStreakDay:user.currentStreakDay,
-            longestStreakDay:user.longestStreakDay,
-            testsCompleted:user.testsCompleted,
-            coursesCompleted:user.coursesCompleted,
-            totalTimeSpent:user.totalTimeSpent
-        };
-        return res.status(200).json({
-            data:data,
-            success:true
-        });
-    } catch (error) {
-        res.status(400).json({
-            message : 'something went wrong',
-            success : false
-        });
-    }
-};
-
-
-
-module.exports.getReminder = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        const data = user.reminder;
-        return res.status(200).json({
-            data:data,
-            success:true
-        });
-    } catch (error) {
-        res.status(400).json({
-            message : 'something went wrong',
-            success : false
-        });
-    }
-};
-
-
 module.exports.getProfile = async function (req, res){
     try{
-        let user = await User.findOne({ _id : req.user._id }).populate([{path:'courseProgress'},{path:'testSeriesProgress'}]);
+        let user = await User.findOne({ _id : req.user._id }).populate([{path:'courses', select : "name chapters duration userEnrolled totalSubTopics"},{path:'testSeries', select : "name quizzes"},{path:'courseProgress'},{path:'testSeriesProgress'}]);
+        user = user.toJSON();
+        let userProgress = user.courseProgress;
+        user.courses.forEach(course=>{
+            let completedSubTopics = 0;
+            let data = userProgress.filter(obj=> obj.courseId == course._id.toString());
+            data.forEach(chapter=>{
+                completedSubTopics += chapter.subTopics.length;
+            })
+            course['completedSubTopics'] = completedSubTopics;
+            course['totalChapters'] = course.chapters.length;
+            delete course.chapters;
+        })
+        user.testSeries.forEach(test=>{
+            test.totalQuizzes = test.quizzes.length;
+            delete test.quizzes;
+        })
+        
         res.status(200).json({
             data : user,
             message : 'successfully fetched profile data',
@@ -524,7 +478,7 @@ module.exports.getProfile = async function (req, res){
         });
     }
     catch(error){
-        res.status(400).json({
+        res.status(500).json({
             message : error.message,
             success : false
         });

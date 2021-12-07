@@ -96,19 +96,27 @@ const userSchema = new Schema({
         duration:{
             type:Number,
             default:0
+        },
+        watchDuration:{
+            type:Number,
+            default:0
         }
     }],
     testDuration:[{
         date:{
-            type:Date,
+            type:String,
             default:Date.now
         },
         duration: {
             type: Number,
             default: 0
-        }
+        },
+        testsCompleted:{
+            type:Number,
+            default:0
+        },
     }], 
-    minutesGoal:{
+    minutesGoal:{          // goal for watching videos
         type:Number,
         default:60
     },
@@ -121,10 +129,6 @@ const userSchema = new Schema({
         default:0
     },
     longestStreakDay:{
-        type:Number,
-        default:0
-    },
-    testsCompleted:{
         type:Number,
         default:0
     },

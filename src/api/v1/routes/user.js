@@ -9,15 +9,11 @@ const { registerUser, login, resendMail, googleOauth, confirmEmail, resetPasswor
 router.post('/register', registerUser);
 
 router.post('/login', login);
-router.post('/oauth/google', passport.authenticate(
-    'google-token', { session: false }), googleOauth);
+router.post('/oauth/google', passport.authenticate('google-token', { session: false }), googleOauth);
 router.get('/resendMail',resendMail);
 router.get('/confirmEmail', confirmEmail);
 router.post('/forgotPassword', forgotPassword);
 router.post('/resetPassword', resetPassword);
-router.get('/userProgress', passport.authenticate('jwt', { session:false }), userProgress);
-router.get('/getReminder', passport.authenticate('jwt', { session:false }), getReminder);
-router.post('/addReminder', passport.authenticate('jwt', { session:false }), addReminder);
 router.get('/cart/:id', passport.authenticate('jwt', { session:false }), getCart);
 router.delete('/cart/:id', passport.authenticate('jwt', { session:false }), deleteProductInCart);
 router.post('/cart/:id', passport.authenticate('jwt', { session:false }), addToCart);
