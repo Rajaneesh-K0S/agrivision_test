@@ -20,6 +20,7 @@ router.use('/coupens', require('./coupen'));
 
 router.use('/magazine', require('./magazine'));
 router.use('/academics', require('./academics'));
+router.use('/carousels', require("./carousel"));
 
 router.get('/', (req, res) => {
     logger.debug('GET /v1');
