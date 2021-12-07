@@ -67,6 +67,11 @@ module.exports.getUserProgress = async function(req, res){
         }else{
             data['todayReadingDuration'] = 0;
         }
+        if(user.testDuration.filter(obj=> obj.date == todayDate).length){
+            data['todayTestCompleted'] = user.testDuration.filter(obj=> obj.date == todayDate)[0].testsCompleted;
+        }else{
+            data['todayTestsCompleted'] = 0;
+        }
         let lastCompletedSubTopic = user.lastCompleted;
         let topic = await Topic.findOne({"subTopics" : lastCompletedSubTopic}, {"_id" : 1});
         let chapter = await Chapter.findOne({"topics" : topic._id}, {"_id" : 1});
@@ -113,6 +118,29 @@ module.exports.getSchedule = async (req, res)=>{
         res.status(200).json({
             data,
             message : "successfully fetched events data",
+            success : true
+        })
+    }
+    catch(err){
+        res.status(500).json({
+            message : err.message,
+            success : false
+        })
+    }
+}
+
+module.exports.setGoal = async (req, res)=>{
+    try{
+        let {readingGoal, watchingGoal} = req.body;
+        let userId = req.user._id;
+        if(readingGoal){
+            await User.updateOne({_id : userId}, {readingGoal});
+        }
+        if(watchingGoal){
+            await User.updateOne({_id : userId}, {minutesGoal:watchingGoal});
+        }
+        res.status(200).json({
+            message : "Successfully updated goals",
             success : true
         })
     }
