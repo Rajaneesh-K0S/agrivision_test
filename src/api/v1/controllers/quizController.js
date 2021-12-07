@@ -34,6 +34,12 @@ let calculateRank = (markedAnswers, allQuestions) => {
                         isCorrect = true;
                     }
                 })
+            }else if(ques.questionType == 2 && correctAnsArray.length == 4){
+                markedAnsArray.forEach(markedAns=>{
+                    if((markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]) || (markedAns>= correctAnsArray[2] && markedAns<= correctAnsArray[3]) ){
+                        isCorrect = true;
+                    }
+                })
             }
             let markedAnsString = markedAnsArray.sort().join(',');
             let correctAnsString = ques.correctAnswer.sort().join(',');
@@ -105,6 +111,12 @@ let findAnalysisByTopic = async (markedAnswers, allQuestions) => {
             }else if(question.questionType == 2 && correctAnsArray.length == 2){
                 markedAnsArray.forEach(markedAns=>{
                     if(markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]){
+                        isCorrect = true;
+                    }
+                })
+            }else if(question.questionType == 2 && correctAnsArray.length == 4){
+                markedAnsArray.forEach(markedAns=>{
+                    if((markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]) || (markedAns>= correctAnsArray[2] && markedAns<= correctAnsArray[3]) ){
                         isCorrect = true;
                     }
                 })
@@ -410,6 +422,12 @@ module.exports.getAnalysis = async (req, res) => {
                             }else if(question.questionType == 2 && correctAnsArray.length == 2){
                                 markedAnsArray.forEach(markedAns=>{
                                     if(markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]){
+                                        isCorrect = true;
+                                    }
+                                })
+                            }else if(question.questionType == 2 && correctAnsArray.length == 4){
+                                markedAnsArray.forEach(markedAns=>{
+                                    if((markedAns>= correctAnsArray[0] && markedAns<= correctAnsArray[1]) || (markedAns>= correctAnsArray[2] && markedAns<= correctAnsArray[3]) ){
                                         isCorrect = true;
                                     }
                                 })
