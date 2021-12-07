@@ -3,7 +3,7 @@ const { User } = require('../../models');
 const { getLocalTimeString } = require('../');
 var streakCalculatorJob = new CronJob('0 0 1 * * *', async function () {
     try{
-        console.lo("hi everynight 1 am");
+        console.log("hi everynight 1 am");
         const users = await User.find({});
         let currentDate = getLocalTimeString(new Date());
         let previousDate = new Date();
