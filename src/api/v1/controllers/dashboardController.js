@@ -73,11 +73,22 @@ module.exports.getUserProgress = async function(req, res){
             data['todayTestsCompleted'] = 0;
         }
         let lastCompletedSubTopic = user.lastCompleted;
-        let topic = await Topic.findOne({"subTopics" : lastCompletedSubTopic}, {"_id" : 1});
-        let chapter = await Chapter.findOne({"topics" : topic._id}, {"_id" : 1});
-        let course = await Course.findOne({"chapters" : chapter._id}, {"_id" : 1});
-        let lastCompleted = {courseId : course._id, chapterId : chapter._id, topicId : topic._id, subTopicId : lastCompletedSubTopic};
+        let lastCompleted = {};
+        if(lastCompletedSubTopic){
+            let topic, chapter, course;
+            topic = await Topic.findOne({"subTopics" : lastCompletedSubTopic}, {"_id" : 1});
+            if(topic){
+                chapter = await Chapter.findOne({"topics" : topic._id}, {"_id" : 1});
+            }
+            if(chapter){
+                course = await Course.findOne({"chapters" : chapter._id}, {"_id" : 1});
+            }
+            if(course){
+                lastCompleted = {courseId : course._id, chapterId : chapter._id, topicId : topic._id, subTopicId : lastCompletedSubTopic};
+            }
+        }
         data['lastCompleted'] = lastCompleted;
+        
         return res.status(200).json({
             data:data,
             success:true
