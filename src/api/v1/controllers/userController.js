@@ -1,7 +1,8 @@
 const { User,  SubTopic } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
-const transporter = require('../../../config/nodemailer');
+const {transporter, oAuth2Client} = require('../../../config/nodemailer');
+
 
 // const { boolean } = require('joi');
 // module.exports.userProfile=async(req,res)=>{
@@ -183,6 +184,64 @@ module.exports.googleOauth = async function (req, res) {
     const token = generateToken(user);
     return res.status(200).send({ token, user });
 };
+
+module.exports.googleOneTapLogin = async (req, res) => {
+    try {
+        const { tokenId } = req.body
+        oAuth2Client.verifyIdToken({ idToken: tokenId, audience: process.env.prod_GOOGLEAUTH_CLIENTID }).then(async response => {
+            const { email_verified, name, email } = response.payload;
+            let success = false;
+            if (email_verified) {
+                let user = await User.findOne({email});
+                if(user){
+                    //login the user
+                    let authToken = generateToken(user);
+                    success = true;
+                    return res.status(200).json({
+                        success,
+                        authToken,
+                        user:{
+                            name:user.name,
+                            email:user.email,
+                            _id:user._id,
+                            courses:user.courses
+                        }
+                    })
+                }else{
+                    //Sign up the user
+                    const password = email + process.env.JWT_SECRET;
+                    const salt = await bcrypt.genSalt(10);
+                    const secPass = await bcrypt.hash(password, salt);
+                    let newUser = new User({ name: name, password: secPass, email: email })
+                    await newUser.save();
+                    success = true;
+                    let authToken = generateToken(newUser);
+                    res.status(200).json({
+                        success,
+                        authToken,
+                        user:{
+                            name:newUser.name,
+                            email:newUser.email,
+                            _id:newUser._id,
+                            courses:newUser.courses
+                        }
+                    });
+                }
+            }else{
+                res.status(400).json({
+                    success : false,
+                    message : 'invalid account'
+                })
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            success : false,
+            message : error.message
+        });
+    }
+}
+
 
 
 module.exports.confirmEmail = async function (req, res) {

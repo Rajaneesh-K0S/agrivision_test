@@ -22,3 +22,4 @@ const transporter = nodemailer.createTransport({
 });
 
 module.exports = transporter;
+module.exports.oAuth2Client = oAuth2Client;
