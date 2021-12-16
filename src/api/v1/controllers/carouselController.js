@@ -10,6 +10,7 @@ module.exports.allCarousels = async function (req, res) {
         data.push({
             link: element.link,
             order: element.order,
+            redirectingPage: element.redirectingPage
         });
         });
 

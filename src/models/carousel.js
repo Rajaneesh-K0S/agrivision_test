@@ -8,6 +8,7 @@ let carouselSchema = new Schema({
         {
             link:String,
             order:Number,
+            redirectingPage:String,
         }
     ]
 })
