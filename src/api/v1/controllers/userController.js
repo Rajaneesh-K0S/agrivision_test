@@ -187,9 +187,9 @@ module.exports.googleOauth = async function (req, res) {
 
 module.exports.googleOneTapLogin = async (req, res) => {
     try {
-        const { tokenId } = req.body
-        oAuth2Client.verifyIdToken({ idToken: tokenId, audience: process.env.prod_GOOGLEAUTH_CLIENTID }).then(async response => {
-            const { email_verified, name, email } = response.payload;
+
+            const { email_verified, name, email } = req.body;
+
             let success = false;
             if (email_verified) {
                 let user = await User.findOne({email});
@@ -233,7 +233,8 @@ module.exports.googleOneTapLogin = async (req, res) => {
                     message : 'invalid account'
                 })
             }
-        })
+
+
     } catch (error) {
         res.status(500).json({
             success : false,
