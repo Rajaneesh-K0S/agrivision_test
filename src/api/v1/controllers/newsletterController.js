@@ -5,10 +5,10 @@ module.exports.addSubscription = async function (req, res) {
         // check if email id exist
         const emailExists = await Newsletter.exists({ email: req.body.email });
         if (emailExists) {
-            // if job subscription
+            // if job Update subscription
             if (req.body.type == "jobUpdate") {
                 subscription = await Newsletter.findOneAndUpdate(
-                    { email: email },
+                    { email: req.body.email },
                     { $set: { subscribedJobUpdate: true } }
                 );
                 res.status(200).json({
@@ -18,18 +18,16 @@ module.exports.addSubscription = async function (req, res) {
             }
             //   if newsletter subscription
             else if (req.body.type == "newsLetter") {
-                const stayUptoDate = req.body.stayUptoDate;
                 subscription = await Newsletter.findOneAndUpdate(
-                    { email: email },
+                    { email: req.body.email },
                     {
                         $set: {
                             subscribedNewsletter: true,
-                            stayUptoDate: stayUptoDate,
+                            stayUpToDate: req.body.stayUptoDate,
                         },
                     }
                 );
                 res.status(200).json({
-                    data: subscription,
                     message: "newsletter subscription added successfully",
                     success: true,
                 });
@@ -50,7 +48,7 @@ module.exports.addSubscription = async function (req, res) {
                 });
                 await subscription.save();
                 res.status(200).json({
-                    message: "job subscription added",
+                    message: "job subscription added successfully",
                     success: true,
                 });
             } else if (req.body.type == "newsLetter") {
@@ -62,7 +60,7 @@ module.exports.addSubscription = async function (req, res) {
 
                 await subscription.save();
                 res.status(200).json({
-                    message: "job subscription added",
+                    message: "newsletter subscription added successfully",
                     success: true,
                 });
             } else {
