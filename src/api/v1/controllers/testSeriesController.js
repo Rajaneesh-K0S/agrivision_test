@@ -1,29 +1,93 @@
-const { TestSeries, Subject, User } = require('../../../models');
-
-
+const { TestSeries, Subject, User, Quiz } = require('../../../models');
 
 
 module.exports.allTestSeries = async function (req, res) {
     try {
-        let testSeries;
-        if(req.query.exam){
-            testSeries = await TestSeries.find({ 'exam':req.query.exam, 'show' : true });
-        }
-        else if (req.query.subject) {
-            testSeries = await TestSeries.find({ 'subject':req.query.subject, 'show' : true });
-        } else {
-            testSeries = await TestSeries.find({'show' : true });
-        }
-        let data = [];
-        testSeries.forEach(element => {
-            data.push({
-                testSeriesId: element._id,
-                name: element.name,
-                image: element.bigImage,
-                includes: element.includes,
-                isPublic: element.isPublic
+        let data = {};
+        if(req.query.page==0){
+            let testSeries = await TestSeries.find({show : true}).populate({path : "quizzes", select : "category"});
+            testSeries.forEach((test, i)=>{
+                test = test.toJSON();
+                test['fullLengthTestCount'] = test.quizzes.filter(obj=> obj.category == 2).length;
+                test['sectionalTestCount'] = test.quizzes.filter(obj=> obj.category == 1).length;
+                test['previousTestCount'] = test.quizzes.filter(obj=> obj.category == 0).length;
+                test['modelTestCount'] = test.fullLengthTestCount;
+                delete test.quizzes;
+                testSeries[i] = test;
+                // console.log(fullLengthTestCount, sectionalTestCount, previousTestCount, modelTestCount);
+            })
+            let popularTestSeries = testSeries.filter(obj=> obj.isPopular == true);
+            let freeTestSeries = testSeries.filter(obj=> (obj.price == 0 || obj.isPublic == true));
+            let examTestSeries = testSeries;
+            const examMap = new Map();
+            examTestSeries.forEach(testSeries=> {
+                examMap.set(testSeries.exam,[])
             });
-        });
+            examTestSeries.forEach(testSeries=> {
+                let testSeriesArray = examMap.get(testSeries.exam);
+                examMap[testSeries.exam] = testSeriesArray.push(testSeries);
+            });
+            examTestSeries = examMap;
+            
+
+            data = {'popularTestSeries': popularTestSeries, 'freeTestSeries': freeTestSeries, 'examTestSeries': [...examTestSeries]};
+            
+        }
+
+        if(req.query.page==1){
+            if(req.query.exam){
+               let examWiseQuizes = await Quiz.find({category:0, generalPYQ : true, exam : req.query.exam}, {"name" : 1, "category" : 1, "quizStartDate" : 1, "Poster" : 1, "syllabus" : 1 });
+               data = {exam : req.query.exam};
+               data['quizzes'] = examWiseQuizes;
+            }else{
+                let attemptedQuizes = [];
+                if(req.query.userId){
+                    let user = await User.findOne({_id : req.query.userId}).populate({path : 'completedQuizes', select : 'name subject'});
+                    attemptedQuizes = user.completedQuizes;
+                }
+                let examWiseQuizes = await Quiz.find({category:0, generalPYQ : true}, {"exam" : 1});
+                let exams = [];
+                examWiseQuizes.forEach(quiz=>{
+                    let ob = exams.filter(e=>e.exam == quiz.exam);
+                    if(ob.length){
+                        ob[0].quizCount++;
+                    }else{
+                        exams.push({exam : quiz.exam, quizCount : 1});
+                    }
+                })    
+                data = {'examWiseQuizes': exams, 'attemptedQuizes': [...attemptedQuizes]};
+            }
+        }
+
+        if(req.query.page==2){
+            let quizzes = await Quiz.find({quizType : 3});
+            let subjectWiseQuizes = quizzes;
+            let chapterWiseQuizes = quizzes;
+            let fullLengthTest = quizzes.filter(obj=> obj.category == 2);
+            let freeQuizes = quizzes.filter(obj=> obj.Price == 0);
+            const subjectMap = new Map();
+            subjectWiseQuizes.forEach(quiz=> {
+                subjectMap.set(quiz.subject,[])
+            });
+            subjectWiseQuizes.forEach(quiz=> {
+                let quizArray = subjectMap.get(quiz.subject);
+                subjectMap[quiz.subject] = quizArray.push(quiz);
+            });
+            subjectWiseQuizes = subjectMap;
+
+            const chapterMap = new Map();
+            chapterWiseQuizes.forEach(quiz=> {
+                chapterMap.set(quiz.chapter,[])
+            });
+            chapterWiseQuizes.forEach(quiz=> {
+                let chapterQuizArray = chapterMap.get(quiz.chapter);
+                chapterMap[quiz.chapter] = chapterQuizArray.push(quiz);
+            });
+            chapterWiseQuizes = chapterMap;
+            
+
+            data = {'fullLengthTest': fullLengthTest, 'freeQuizes':freeQuizes,'subjectWiseQuizes':[...subjectWiseQuizes], 'chapterWiseQuizes':[...chapterWiseQuizes]};
+        }
 
         res.status(200).json({
             message: 'test series fetched',

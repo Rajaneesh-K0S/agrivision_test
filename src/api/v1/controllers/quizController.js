@@ -349,6 +349,7 @@ module.exports.submitQuiz = async (req, res) => {
             testDuration.duration += quiz.totalTime;
             testDuration.testsCompleted +=1;
         }
+        user.completedQuizes.push(quiz._id);
         await user.save();
         res.status(200).json({
             message: 'succesfully submitted the quiz',

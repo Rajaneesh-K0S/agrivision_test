@@ -172,7 +172,12 @@ const userSchema = new Schema({
         quizzes:[{
             type:Schema.Types.ObjectId,
             unique:true
-        }]
+        }],
+        quizCount : Number
+    }],
+    completedQuizes:[{
+        type : Schema.Types.ObjectId,
+        ref : 'Quiz'
     }],
     paymentHistory : [PaymentDetailsSchema]
 });

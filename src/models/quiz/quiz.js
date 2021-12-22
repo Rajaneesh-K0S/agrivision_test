@@ -23,10 +23,11 @@ const quizTableSchema = new Schema({
     totalNoQuestions : Number,
     maxScore : Number,
     exam: String,
+    chapter: String,
 
     subject:String,
     category : Number,                  // 0 for previous year mocks, 1 for sectional tests, 2 for full length tests
-
+    generalPYQ : Boolean,
     calculator : Boolean,
     totalTime : Number,
     startTime : Number,

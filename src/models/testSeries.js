@@ -15,12 +15,14 @@ let testSeriesSchema = new Schema({
     bigImage : String,
     smallImage : String,
     price : Number,
+    originalPrice : Number,
     exam : String,
     subject : String,
     rating : Number,
     description : String,
     userEnrolled : Number,
     isPublic: Boolean,
+    isPopular: Boolean,
     show : Boolean,                     // to show or hide a test series
     subjects : [{
         type : Schema.Types.ObjectId,
