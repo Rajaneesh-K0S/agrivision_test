@@ -336,7 +336,7 @@ module.exports.submitQuiz = async (req, res) => {
             let rankObj = calculateRank(markedAnswers, allQuestions);
             await Rank.findOneAndUpdate({ userId, quizId }, rankObj);
         }
-        let user = await User.findOne({_id : userId}, {"testDuration" : 1});
+        let user = await User.findOne({_id : userId}, {"testDuration" : 1, "completedQuizes" : 1});
         const date = getLocalTimeString(new Date());
         let testDuration = user.testDuration[user.testDuration.length - 1];
         if(!testDuration || !(testDuration.date == date)){
