@@ -4,6 +4,7 @@ const {showAllColleges,collegeDetails} = require('../controllers/academicControl
 const passport = require('passport');
 
 router.get('/',showAllColleges);
+router.get('/advanceCollegeSearch', customSearch);
 router.get('/:id',collegeDetails);
 
 module.exports = router;
