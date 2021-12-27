@@ -5,13 +5,16 @@ const uuid = require('uuid');
 async function getResponseFromDialogflow(data, projectId = 'newagent-fbpr') {
     // A unique identifier for the given session
     const sessionId = uuid.v4();
-    const pth = __dirname + "/newagent-fbpr-00b4b2bbd863.json";
+    // const pth = __dirname + "/newagent-fbpr-00b4b2bbd863.json";
     // Create a new session
-    const sessionClient = new dialogflow.SessionsClient(
-        {
-            keyFilename: pth
-        }
-    );
+    let options = {
+        credentials: {
+            client_email: process.env.dialogflowClientEmail,
+            private_key: process.env.dialogflowPrivateKey,
+        },
+        projectId: process.env.dialogflowProjectId
+    }
+    const sessionClient = new dialogflow.SessionsClient(options);
     const sessionPath = sessionClient.projectAgentSessionPath(
         projectId,
         sessionId
@@ -49,7 +52,7 @@ module.exports.getResult = async (req, res) => {
     }
     catch (err) {
         res.status(500).json({
-            data: err,
+            data: err.message,
             success: false
         })
     }
