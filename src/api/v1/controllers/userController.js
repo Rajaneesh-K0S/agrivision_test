@@ -1,4 +1,4 @@
-const { User,  SubTopic } = require('../../../models');
+const { User, Package } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
 const transporter= require('../../../config/nodemailer');
@@ -457,8 +457,18 @@ module.exports.getCart = async (req, res)=>{
          
         let totalItems = testSeriesItems.length + courseItems.length + packageItems.length;
 
+        let packageIds = ['617c3d185d418b71ade1335d', '6182d9388f14300791b25d16', '6182dd828f14300791b25d17']
+        let similarPackageData = [];
+        for(let i =0;i<packageIds.length; i++){
+            let pack = await Package.findOne({_id : packageIds[i]}, {"name" : 1, "subject" : 1, "rating" : 1, "price" : 1, "originalPrice": 1, "highlights" : 1});
+            pack = pack.toJSON();
+            pack['image'] = pack.bigImage;
+            pack['packageId'] = pack._id;
+            similarPackageData.push(pack);
+        }
+
         res.status(200).json({
-            data : { totalItems, courseItems, testSeriesItems, packageItems, totalAmount },
+            data : { totalItems, courseItems, testSeriesItems, packageItems, totalAmount, similarPackageData },
             message : 'successfully fetched cart data',
             success : true
         });
