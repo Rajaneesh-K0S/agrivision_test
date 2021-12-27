@@ -1,7 +1,7 @@
 const { User,  SubTopic } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
-const {transporter, oAuth2Client} = require('../../../config/nodemailer');
+const transporter= require('../../../config/nodemailer');
 
 
 // const { boolean } = require('joi');
