@@ -109,15 +109,21 @@ module.exports.testSeriesById = async function (req, res) {
         if (req.query.queryParam == 0) {
 
             let category = req.query.category;
-            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1}).populate({path: 'quizzes', select : "name category Poster quizStartDate syllabus"});;
+            let testSeries = await TestSeries.findOne({_id : testSeriesId}, {"name" : 1, "freeTrialQuizzes" : 1}).populate({path: 'quizzes', select : "name category Poster quizStartDate syllabus"});;
             if(category){
                 let categoryWiseQuizzes = testSeries.quizzes.filter(quiz=> quiz.category == category);
                 testSeries.quizzes = categoryWiseQuizzes;
             }
             testSeries = testSeries.toJSON();
+            testSeries.freeTrialQuizzes = testSeries.freeTrialQuizzes.map(quiz=> quiz._id = quiz._id.toString());
             testSeries.quizzes.forEach(quiz=>{
                 let date = new Date(quiz.quizStartDate);
                 quiz.quizStartDate = date.getTime();
+                if(testSeries.freeTrialQuizzes.includes(quiz._id.toString())){
+                    quiz['isFreeTrial'] = true;
+                }else{
+                    quiz['isFreeTrial'] = false;
+                }
             })
            
 

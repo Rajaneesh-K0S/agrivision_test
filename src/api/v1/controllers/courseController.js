@@ -82,6 +82,13 @@ module.exports.courseById = async function (req, res) {
             let course = await Course.findById(courseId).populate({ path: 'chapters', populate: { path: 'topics', select: 'name totalSubtopics' } });
             course = course.toJSON();
             course.chapters = await chapterWiseProgress(courseId, course.chapters, req.user);
+            course.chapters.forEach(chapter=>{
+                if(chapter.freeTrialTopics.length){
+                    chapter['isFreeTrial'] = true;
+                }else{
+                    chapter['isFreeTrial'] = false;
+                }
+            })
             res.status(200).json({
                 message: 'course fetched',
                 data: course,
@@ -97,6 +104,14 @@ module.exports.courseById = async function (req, res) {
             let chapter = await Chapter.findById(chapterId).populate({ path: 'topics', populate: { path: 'subTopics', select: 'name' } });
             chapter = chapter.toJSON();
             chapter = await subTopicWiseProgress(courseId, chapter, req.user);
+            chapter.freeTrialTopics = chapter.freeTrialTopics.map(topic=> topic._id = topic._id.toString());
+            chapter.topics.forEach(topic=>{
+                if(chapter.freeTrialTopics.includes(topic._id.toString())){
+                    topic['isFreeTrial'] = true;
+                }else{
+                    topic['isFreeTrial'] = false;
+                }
+            })
             res.status(200).json({
                 message: 'course fetched',
                 data: { course, chapter},
