@@ -326,11 +326,14 @@ module.exports.submitQuiz = async (req, res) => {
         // const userId = '616a40b67a5512001682343c';
         const quiz = await Quiz.findOne({_id : quizId}, {"totalTime" : 1, "quizType" : 1, "endTime" : 1});
         const rank = await Rank.findOne({quizId, userId}, {"startTime" : 1});
-        const startTime = rank.startTime;
+        let startTime = rank.startTime;
+        if(!startTime){
+            startTime = Date.now()-quiz.totalTime*60000
+        }
         const quizEndTime = (quiz.quizType == 0)?(quiz.endTime):(startTime + quiz.totalTime*60000) ;
         const finishedTime = Math.min(Date.now(), quizEndTime); 
-        const totalTime = (finishedTime - startTime)/60000;
-        await Rank.findOneAndUpdate({ userId, quizId }, { isSubmitted: true, totalTime: totalTime });
+        const totalTimeTaken = (finishedTime - startTime)/60000;
+        await Rank.findOneAndUpdate({ userId, quizId }, { isSubmitted: true, totalTime: totalTimeTaken });
         if (quiz.quizType == 1 || quiz.quizType == 2 || quiz.quizType == 3) {
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
             let rankObj = calculateRank(markedAnswers, allQuestions);
@@ -373,7 +376,7 @@ module.exports.getAnalysis = async (req, res) => {
     try {
         if (req.query.queryParam == 0) {
             let rank = await Rank.findOne({ userId, quizId });
-            let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
+            let sortedRank = await Rank.find({ quizId : quizId, isSubmitted : true }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
             let quizData = await Quiz.findOne({ _id: quizId }, { name: 1, maxScore: 1, totalNoQuestions: 1, totalTime: 1, chapters: 1 });
             if (rank) {
                 let quizName = quizData.name;
@@ -483,8 +486,8 @@ module.exports.getAnalysis = async (req, res) => {
             try {
                 let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
                 let userMarkedAnswers = markedAnswers;
-                let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
-                let topperMarked = await Rank.findOne({ quizId }, { markedAns: 1 }).sort({ totalScore: -1, totalTime: 1 }).limit(0);
+                let sortedRank = await Rank.find({ quizId : quizId, isSubmitted : true }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
+                let topperMarked = await Rank.findOne({ quizId: quizId, isSubmitted: true}, { markedAns: 1 }).sort({ totalScore: -1, totalTime: 1 }).limit(0);
                 let topperMarkedAnswers = topperMarked.markedAns;
                 let userAnalysisByTopic = await findAnalysisByTopic(userMarkedAnswers, allQuestions);
                 let topperAnalysisByTopic = await findAnalysisByTopic(topperMarkedAnswers, allQuestions);
