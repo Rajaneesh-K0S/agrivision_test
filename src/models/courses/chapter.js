@@ -7,10 +7,6 @@ const chapterSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Topic'
     }],
-    freeTrialTopics:[{
-        type:Schema.Types.ObjectId,
-        ref:'Topic'
-    }],
     totalSubTopics:Number 
 });
 
