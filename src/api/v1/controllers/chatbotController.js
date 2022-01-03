@@ -51,6 +51,7 @@ module.exports.getResult = async (req, res) => {
         // res.send("hello world")
     }
     catch (err) {
+        console.log(err)
         res.status(500).json({
             data: err.message,
             success: false
