@@ -4,6 +4,7 @@ module.exports.Magazine = require('./magazine');
 module.exports.Article = require('./article');
 module.exports.Carousel= require('./carousel');
 module.exports.Newsletter= require('./newsletter');
+module.exports.Notification= require('./notification');
 
 
 

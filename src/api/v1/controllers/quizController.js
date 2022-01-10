@@ -66,7 +66,11 @@ module.exports.calculateRankForAll = async (req, res) => {
             let userId = ranks[i].userId;
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
             let obj = calculateRank(markedAnswers, allQuestions);
+            obj['isSubmitted'] = true;
             await Rank.findOneAndUpdate({ userId, quizId }, obj);
+            if(!ranks[i].isSubmitted){
+                await User.updateOne({_id : userId}, {"$push" : {"completedQuizes" : quizId}});
+            }
         }
         res.status(200).json({
             message: "successfully calculated rank for all the users of the quiz",

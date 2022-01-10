@@ -22,6 +22,7 @@ router.use('/magazine', require('./magazine'));
 router.use('/academics', require('./academics'));
 router.use('/carousels', require("./carousel"));
 router.use('/newsletter', require("./newsletter"));
+router.use('/notifications', require("./notifications"));
 
 
 router.get('/', (req, res) => {

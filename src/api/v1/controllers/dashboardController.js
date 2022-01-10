@@ -108,7 +108,6 @@ module.exports.getSchedule = async (req, res)=>{
         let todayDate = getLocalTimeString(new Date());
         console.log(todayDate);
         let events = await Event.find({date: todayDate});
-        console.log(events);
         let data = [];
         userCourses.forEach(courseId=>{
             let courseEvents = events.filter(obj=> obj.relatedCourses.includes(courseId));
@@ -116,7 +115,6 @@ module.exports.getSchedule = async (req, res)=>{
         })
         let allEvents = events.filter(obj=> obj.eventForAll == true);
         data = data.concat(allEvents);
-        console.log(data);
         data = Array.from(new Set(data));
         data.forEach((event, i)=>{
             event = event.toJSON();
