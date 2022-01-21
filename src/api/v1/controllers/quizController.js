@@ -1,11 +1,11 @@
 const { Question, Quiz, Rank, Course, TestSeries, User } = require("../../../models");
-
+const { getLocalTimeString } = require('../../../utils')
 
 let markedAnsData = async (quizId, userId) => {
     let marked = await Rank.findOne({ quizId, userId }, { markedAns: 1 });
     if (marked) {
         let markedAnswers = marked.markedAns;
-        let allQuestions = await Question.find({ quizId }, { 'topic': 1, 'correctAnswer': 1, 'marking': 1, 'negMarking': 1 });
+        let allQuestions = await Question.find({ quizId }, { 'topic': 1, 'correctAnswer': 1, 'marking': 1, 'negMarking': 1, 'questionType': 1 });
         return { markedAnswers, allQuestions };
     } else {
         throw new Error("User did not attempt the quiz.");
@@ -24,12 +24,26 @@ let calculateRank = (markedAnswers, allQuestions) => {
     allQuestions.forEach(ques => {
         if (markedAnswers.has(ques._id.toString())) {
             let markedAnsArray = markedAnswers.get(ques._id.toString());
+            let correctAnsArray = ques.correctAnswer;
+            let isCorrect = false;
             if (ques.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
+            } else if (ques.questionType == 2 && correctAnsArray.length == 2) {
+                markedAnsArray.forEach(markedAns => {
+                    if (markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) {
+                        isCorrect = true;
+                    }
+                })
+            } else if (ques.questionType == 2 && correctAnsArray.length == 4) {
+                markedAnsArray.forEach(markedAns => {
+                    if ((markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) || (markedAns >= correctAnsArray[2] && markedAns <= correctAnsArray[3])) {
+                        isCorrect = true;
+                    }
+                })
             }
             let markedAnsString = markedAnsArray.sort().join(',');
             let correctAnsString = ques.correctAnswer.sort().join(',');
-            if (markedAnsString == correctAnsString) {
+            if (isCorrect || (markedAnsString == correctAnsString)) {
                 obj['totalCorrect']++;
                 obj['positiveMarks'] += ques.marking;
                 obj['totalScore'] += ques.marking;
@@ -52,7 +66,11 @@ module.exports.calculateRankForAll = async (req, res) => {
             let userId = ranks[i].userId;
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
             let obj = calculateRank(markedAnswers, allQuestions);
+            obj['isSubmitted'] = true;
             await Rank.findOneAndUpdate({ userId, quizId }, obj);
+            if(!ranks[i].isSubmitted){
+                await User.updateOne({_id : userId}, {"$push" : {"completedQuizes" : quizId}});
+            }
         }
         res.status(200).json({
             message: "successfully calculated rank for all the users of the quiz",
@@ -90,12 +108,26 @@ let findAnalysisByTopic = async (markedAnswers, allQuestions) => {
         if (markedAnswers.has(question._id.toString())) {
             obj['attempted']++;
             let markedAnsArray = markedAnswers.get(question._id.toString());
+            let correctAnsArray = question.correctAnswer;
+            let isCorrect = false;
             if (question.questionType != 2) {
                 markedAnsArray = markedAnsArray.map(v => v + 1);
+            } else if (question.questionType == 2 && correctAnsArray.length == 2) {
+                markedAnsArray.forEach(markedAns => {
+                    if (markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) {
+                        isCorrect = true;
+                    }
+                })
+            } else if (question.questionType == 2 && correctAnsArray.length == 4) {
+                markedAnsArray.forEach(markedAns => {
+                    if ((markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) || (markedAns >= correctAnsArray[2] && markedAns <= correctAnsArray[3])) {
+                        isCorrect = true;
+                    }
+                })
             }
             let markedAnsString = markedAnsArray.sort().join(',');
             let correctAnsString = question.correctAnswer.sort().join(',');
-            if (markedAnsString == correctAnsString) {
+            if (isCorrect || (markedAnsString == correctAnsString)) {
                 obj['correct']++;
                 obj['score'] += question.marking;
             }
@@ -161,19 +193,30 @@ module.exports.isSubscribed = async (req, res, next) => {
                     isSubscribed = true;
                 } else {
                     if (quiz.quizType == 1) {
-                        let testSeries = await TestSeries.findOne({ "quizzes": quizId }, { _id: 1 });
-                        if (testSeries) {
-                            let user = await User.findOne({ _id: userId, "testSeries": testSeries._id }, { _id: 1 });
-                            if (user) {
-                                isSubscribed = true;
+                        let testSeries = await TestSeries.find({ "quizzes": quizId }, { _id: 1, "freeTrialQuizzes": 1 });
+                        if (testSeries.length) {
+                            for (let i = 0; i < testSeries.length; i++) {
+                                if (testSeries[i].freeTrialQuizzes.includes(quizId.toString())) {
+                                    isSubscribed = true;
+                                    break;
+                                } else {
+                                    let user = await User.findOne({ _id: userId, "testSeries": testSeries[i]._id }, { _id: 1 });
+                                    if (user) {
+                                        isSubscribed = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     } else if (quiz.quizType == 2) {
-                        let course = await Course.findOne({ "fullTests": quizId }, { _id: 1 });
-                        if (course) {
-                            let user = await User.findOne({ _id: userId, "courses": course._id }, { _id: 1 });
-                            if (user) {
-                                isSubscribed = true;
+                        let course = await Course.find({ "fullTests": quizId }, { _id: 1 });
+                        if (course.length) {
+                            for (let i = 0; i < course.length; i++) {
+                                let user = await User.findOne({ _id: userId, "courses": course[i]._id }, { _id: 1 });
+                                if (user) {
+                                    isSubscribed = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -205,19 +248,20 @@ module.exports.startQuiz = async (req, res) => {
             let msg = '';
             let rank = await Rank.findOne({ userId, quizId });
             if (!rank) {
-                rank = new Rank({ quizId, userId, userName: req.user.name, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                let startTime = Date.now();
+                rank = new Rank({ quizId, userId, userName: req.user.name, startTime, unattempted: quiz.totalNoQuestions, markedAns: {} });
                 await rank.save();
                 msg = 'quiz was successfully found and sent';
-            }else if(!rank.isSubmitted){
+            } else if (!rank.isSubmitted) {
                 msg = 'quiz was successfully found and sent';
-            }else if(rank.isSubmitted){
+            } else if (rank.isSubmitted) {
                 isAttempted = true;
                 msg = 'You have already attempted the quiz';
             }
             res.status(200).json({
                 isSubscribed: true,
                 isAttempted,
-                data: (req.body.isSubscribed)?quiz:null,
+                data: (req.body.isSubscribed) ? quiz : null,
                 message: msg,
                 success: true
             });
@@ -289,16 +333,38 @@ module.exports.submitQuiz = async (req, res) => {
         const quizId = req.params.id;
         const userId = req.user._id;
         // const userId = '616a40b67a5512001682343c';
-        const quiz = await Quiz.findById(quizId);
-        const startTime = quiz.startTime;
-        const finishedTime = Math.min(new Date().getTime(), quiz.endTime);
-        const totalTime = finishedTime - startTime;
-        await Rank.findOneAndUpdate({ userId, quizId }, { isSubmitted: true, totalTime: totalTime });
+
+        const quiz = await Quiz.findOne({ _id: quizId }, { "totalTime": 1, "quizType": 1, "endTime": 1 });
+        const rank = await Rank.findOne({ quizId, userId }, { "startTime": 1 });
+        let startTime = rank.startTime;
+        if (!startTime) {
+            startTime = Date.now() - quiz.totalTime * 60000
+        }
+        const quizEndTime = (quiz.quizType == 0) ? (quiz.endTime) : (startTime + quiz.totalTime * 60000);
+        const finishedTime = Math.min(Date.now(), quizEndTime);
+        const totalTimeTaken = (finishedTime - startTime) / 60000;
+
+        await Rank.findOneAndUpdate({ userId, quizId }, { isSubmitted: true, totalTime: totalTimeTaken });
         if (quiz.quizType == 1 || quiz.quizType == 2 || quiz.quizType == 3) {
             let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
             let rankObj = calculateRank(markedAnswers, allQuestions);
             await Rank.findOneAndUpdate({ userId, quizId }, rankObj);
         }
+        let user = await User.findOne({ _id: userId }, { "testDuration": 1, "completedQuizes": 1 });
+        const date = getLocalTimeString(new Date());
+        let testDuration = user.testDuration[user.testDuration.length - 1];
+        if (!testDuration || !(testDuration.date == date)) {
+            user.testDuration.push({
+                date: date,
+                duration: quiz.totalTime,
+                testsCompleted: 1
+            });
+        } else {
+            testDuration.duration += quiz.totalTime;
+            testDuration.testsCompleted += 1;
+        }
+        user.completedQuizes.push(quiz._id);
+        await user.save();
         res.status(200).json({
             message: 'succesfully submitted the quiz',
             success: true
@@ -321,7 +387,9 @@ module.exports.getAnalysis = async (req, res) => {
     try {
         if (req.query.queryParam == 0) {
             let rank = await Rank.findOne({ userId, quizId });
-            let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
+
+            let sortedRank = await Rank.find({ quizId: quizId, isSubmitted: true }, { userName: 1, totalScore: 1, userId: 1 }).sort({ totalScore: -1, totalTime: 1 });
+
             let quizData = await Quiz.findOne({ _id: quizId }, { name: 1, maxScore: 1, totalNoQuestions: 1, totalTime: 1, chapters: 1 });
             if (rank) {
                 let quizName = quizData.name;
@@ -332,9 +400,10 @@ module.exports.getAnalysis = async (req, res) => {
                 let totalCorrectPercentage = (rank.totalCorrect) * 100 / totalQuestions;
                 let totalIncorrectPercentage = (rank.totalIncorrect) * 100 / totalQuestions;
                 let totalSkippedPercentage = (rank.unattempted) * 100 / totalQuestions;
+                let totalAttempted = totalQuestions - rank.unattempted;
                 let totalTimeTaken = rank.totalTime;
                 let totalAllotedTime = quizData.totalTime;
-                let timeSpentPerQuestion = totalTimeTaken / (totalQuestions);
+                let timeSpentPerQuestion = (totalAttempted) ? (totalTimeTaken / (totalAttempted)) : (totalTimeTaken);
                 let advisedTimePerQuestion = totalAllotedTime / totalQuestions;
 
                 let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
@@ -343,7 +412,7 @@ module.exports.getAnalysis = async (req, res) => {
 
                 res.status(200).json({
                     message: "successfully fetched overview data in summary.",
-                    data: { quizName,userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
+                    data: { quizName, userId, obtainedMarks, maxMarks, totalQuestions, totalIncorrect, totalCorrectPercentage, totalIncorrectPercentage, totalSkippedPercentage, totalTimeTaken, timeSpentPerQuestion, advisedTimePerQuestion, maxSkippedTopic, maxIncorrectTopic, additionalTopics, sortedRank },
                     success: true
                 })
             }
@@ -363,12 +432,26 @@ module.exports.getAnalysis = async (req, res) => {
                         let question = sections[i].questions[j];
                         if (markedAnswers.has(question._id.toString())) {
                             let markedAnsArray = markedAnswers.get(question._id.toString());
+                            let correctAnsArray = question.correctAnswer;
+                            let isCorrect = false;
                             if (question.questionType != 2) {
                                 markedAnsArray = markedAnsArray.map(v => v + 1);
+                            } else if (question.questionType == 2 && correctAnsArray.length == 2) {
+                                markedAnsArray.forEach(markedAns => {
+                                    if (markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) {
+                                        isCorrect = true;
+                                    }
+                                })
+                            } else if (question.questionType == 2 && correctAnsArray.length == 4) {
+                                markedAnsArray.forEach(markedAns => {
+                                    if ((markedAns >= correctAnsArray[0] && markedAns <= correctAnsArray[1]) || (markedAns >= correctAnsArray[2] && markedAns <= correctAnsArray[3])) {
+                                        isCorrect = true;
+                                    }
+                                })
                             }
                             let markedAnsString = markedAnsArray.sort().join(',');
                             let correctAnsString = question.correctAnswer.sort().join(',');
-                            if (markedAnsString == correctAnsString) {
+                            if (isCorrect || (markedAnsString == correctAnsString)) {
                                 quiz.sections[i].questions[j]['status'] = 1;
                                 quiz.sections[i].questions[j]['markedAns'] = markedAnsArray;
                             }
@@ -383,7 +466,7 @@ module.exports.getAnalysis = async (req, res) => {
                 }
                 res.status(200).json({
                     message: "successfully fetched solution data",
-                    data: {quiz,userName},
+                    data: { quiz, userName },
                     success: true
                 })
             } else {
@@ -416,8 +499,10 @@ module.exports.getAnalysis = async (req, res) => {
             try {
                 let { markedAnswers, allQuestions } = await markedAnsData(quizId, userId);
                 let userMarkedAnswers = markedAnswers;
-                let sortedRank = await Rank.find({ quizId }, { userName: 1, totalScore: 1, userId : 1 }).sort({ totalScore: -1, totalTime: 1 });
-                let topperMarked = await Rank.findOne({ quizId }, { markedAns: 1 }).sort({ totalScore: -1, totalTime: 1 }).limit(0);
+
+                let sortedRank = await Rank.find({ quizId: quizId, isSubmitted: true }, { userName: 1, totalScore: 1, userId: 1 }).sort({ totalScore: -1, totalTime: 1 });
+                let topperMarked = await Rank.findOne({ quizId: quizId, isSubmitted: true }, { markedAns: 1 }).sort({ totalScore: -1, totalTime: 1 }).limit(0);
+
                 let topperMarkedAnswers = topperMarked.markedAns;
                 let userAnalysisByTopic = await findAnalysisByTopic(userMarkedAnswers, allQuestions);
                 let topperAnalysisByTopic = await findAnalysisByTopic(topperMarkedAnswers, allQuestions);

@@ -1,7 +1,8 @@
-const { User,  SubTopic } = require('../../../models');
+const { User, Package } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
-const transporter = require('../../../config/nodemailer');
+const transporter= require('../../../config/nodemailer');
+
 
 // const { boolean } = require('joi');
 // module.exports.userProfile=async(req,res)=>{
@@ -73,6 +74,7 @@ module.exports.registerUser = async (req, res) => {
             success: true,
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             error: err.message,
             message: 'something went wrong',
@@ -182,6 +184,65 @@ module.exports.googleOauth = async function (req, res) {
     const token = generateToken(user);
     return res.status(200).send({ token, user });
 };
+
+module.exports.googleOneTapLogin = async (req, res) => {
+    try {
+
+            const { email_verified, name, email } = req.body;
+
+            let success = false;
+            if (email_verified) {
+                let user = await User.findOne({email});
+                if(user){
+                    //login the user
+                    let authToken = generateToken(user);
+                    success = true;
+                    return res.status(200).json({
+                        success,
+                        authToken,
+                        user:{
+                            name:user.name,
+                            email:user.email,
+                            _id:user._id,
+                            courses:user.courses
+                        }
+                    })
+                }else{
+                    //Sign up the user
+                    const password = email + process.env.JWT_SECRET;
+                    const salt = await bcrypt.genSalt(10);
+                    const secPass = await bcrypt.hash(password, salt);
+                    let newUser = new User({ name: name, password: secPass, email: email })
+                    await newUser.save();
+                    success = true;
+                    let authToken = generateToken(newUser);
+                    res.status(200).json({
+                        success,
+                        authToken,
+                        user:{
+                            name:newUser.name,
+                            email:newUser.email,
+                            _id:newUser._id,
+                            courses:newUser.courses
+                        }
+                    });
+                }
+            }else{
+                res.status(400).json({
+                    success : false,
+                    message : 'invalid account'
+                })
+            }
+
+
+    } catch (error) {
+        res.status(500).json({
+            success : false,
+            message : error.message
+        });
+    }
+}
+
 
 
 module.exports.confirmEmail = async function (req, res) {
@@ -293,26 +354,7 @@ module.exports.forgotPassword = async function (req, res) {
 };
 
 
-module.exports.addReminder = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        let reminder = {
-            task:req.body.task,
-            date:req.body.date
-        };
-        user.reminder.push(reminder);
-        await user.save();
-        return res.status(200).json({
-            success:true,
-            message:'reminder added successfully'
-        });
-    } catch (error) {
-        return res.status(400).json({
-            success:false,
-            message:'something went wrong'
-        });
-    }
-};
+
 
 
 module.exports.addToCart = async(req, res)=>{
@@ -415,8 +457,18 @@ module.exports.getCart = async (req, res)=>{
          
         let totalItems = testSeriesItems.length + courseItems.length + packageItems.length;
 
+        let packageIds = ['617c3d185d418b71ade1335d', '6182d9388f14300791b25d16', '6182dd828f14300791b25d17']
+        let similarPackageData = [];
+        for(let i =0;i<packageIds.length; i++){
+            let pack = await Package.findOne({_id : packageIds[i]}, {"name" : 1, "subject" : 1, "rating" : 1, "price" : 1, "originalPrice": 1, "highlights" : 1});
+            pack = pack.toJSON();
+            pack['image'] = pack.bigImage;
+            pack['packageId'] = pack._id;
+            similarPackageData.push(pack);
+        }
+
         res.status(200).json({
-            data : { totalItems, courseItems, testSeriesItems, packageItems, totalAmount },
+            data : { totalItems, courseItems, testSeriesItems, packageItems, totalAmount, similarPackageData },
             message : 'successfully fetched cart data',
             success : true
         });
@@ -469,54 +521,26 @@ module.exports.deleteProductInCart = async function (req, res) {
 };
 
 
-module.exports.userProgress = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        const data = {
-            readingDuration:user.readingDuration,
-            testDuration:user.testDuration,
-            minutesGoal:user.minutesGoal,
-            readingGoal:user.readingGoal,
-            currentStreakDay:user.currentStreakDay,
-            longestStreakDay:user.longestStreakDay,
-            testsCompleted:user.testsCompleted,
-            coursesCompleted:user.coursesCompleted,
-            totalTimeSpent:user.totalTimeSpent
-        };
-        return res.status(200).json({
-            data:data,
-            success:true
-        });
-    } catch (error) {
-        res.status(400).json({
-            message : 'something went wrong',
-            success : false
-        });
-    }
-};
-
-
-
-module.exports.getReminder = async function(req, res){
-    try {
-        let user = await User.findById(req.user._id);
-        const data = user.reminder;
-        return res.status(200).json({
-            data:data,
-            success:true
-        });
-    } catch (error) {
-        res.status(400).json({
-            message : 'something went wrong',
-            success : false
-        });
-    }
-};
-
-
 module.exports.getProfile = async function (req, res){
     try{
-        let user = await User.findOne({ _id : req.user._id }).populate([{path:'courseProgress'},{path:'testSeriesProgress'}]);
+        let user = await User.findOne({ _id : req.user._id }).populate([{path:'courses', select : "name chapters duration userEnrolled totalSubTopics"},{path:'testSeries', select : "name quizzes"},{path:'courseProgress'},{path:'testSeriesProgress'}]);
+        user = user.toJSON();
+        let userProgress = user.courseProgress;
+        user.courses.forEach(course=>{
+            let completedSubTopics = 0;
+            let data = userProgress.filter(obj=> obj.courseId == course._id.toString());
+            data.forEach(chapter=>{
+                completedSubTopics += chapter.subTopics.length;
+            })
+            course['completedSubTopics'] = completedSubTopics;
+            course['totalChapters'] = course.chapters.length;
+            delete course.chapters;
+        })
+        user.testSeries.forEach(test=>{
+            test.totalQuizzes = test.quizzes.length;
+            delete test.quizzes;
+        })
+        
         res.status(200).json({
             data : user,
             message : 'successfully fetched profile data',
@@ -524,7 +548,7 @@ module.exports.getProfile = async function (req, res){
         });
     }
     catch(error){
-        res.status(400).json({
+        res.status(500).json({
             message : error.message,
             success : false
         });

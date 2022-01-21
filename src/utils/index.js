@@ -1,31 +1,5 @@
-
-
-module.exports.randString = () => {
-    let pass = '';
-    let str = 'PQRSTUVWXIJKLMNO' +
-        'abcdmnopqrsefghijkltuvwxyz01234YZABCDEFGH56789@$';
-
-    for (let i = 1; i <= 13; i++) {
-        let char = Math.floor(Math.random()
-            * str.length + 1);
-        pass += str.charAt(char);
-    }
-
-    return pass;
-};
-
-const jwt = require('jsonwebtoken');
-
-module.exports.generateToken = (user) => {
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-        expiresIn: '12h'
-    });
-    return token;
-
-};
-
-module.exports.generateRandomToken = (str) => {
-    const token = jwt.sign({ article: str }, process.env.JWT_SECRET);
-    return token;
-};
-
+const usefulFuncs = require('./usefulFunctions');
+module.exports.randString = usefulFuncs.randString;
+module.exports.generateToken = usefulFuncs.generateToken;
+module.exports.generateRandomToken = usefulFuncs.generateRandomToken;
+module.exports.getLocalTimeString = usefulFuncs.getLocalTimeString;

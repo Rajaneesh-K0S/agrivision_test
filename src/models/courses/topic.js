@@ -6,10 +6,6 @@ const topicSchema = new Schema({
     subTopics:[{
         type:Schema.Types.ObjectId,
         ref:'SubTopic'
-    }],
-    freeTrialSubTopics:[{
-        type:Schema.Types.ObjectId,
-        ref:'SubTopic'
     }]
 });
 

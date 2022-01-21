@@ -1,47 +1,35 @@
 const mongoose = require("mongoose");
-const {Package,Course} = require("../../../models");
+const {Package, Course, PackageCategory} = require("../../../models");
 
 module.exports.getAllPackages = async(req,res)=>{
     try {
         let packages;
         if(req.query.exam){
-            packages = await Package.find({ 'exam':req.query.exam }).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
+            packages = await PackageCategory.find({'exam' : req.query.exam, 'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
         }
         else if (req.query.subject) {
-            packages = await Package.find({ 'subject':req.query.subject }).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
+            packages = await PackageCategory.find({'subject' : req.query.subject, 'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
+
         } else {
-            packages = await Package.find({}).populate([{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]);
+            packages = await PackageCategory.find({'show' : true}).populate({path : 'packages', populate : [{path: 'courses',select:'name'}, {path: 'testSeries',select:'name'}]}).sort({"sortOrder" : 1});
         }
-        let data = [];
-        packages.forEach(element => {
-            data.push({
-                packageId: element._id,
-                name: element.name,
-                image: element.bigImage,
-                smallImage: element.smallImage,
-                type: element.type,
-                duration: element.duration,
-                testNumber: element.testNumber,
-                videosNumber: element.videosNumber,
-                courses: element.courses,
-                testSeries: element.testSeries,
-                includes: element.includes,
-                description: element.description,
-                highlights: element.highlights,
-                price: element.price,
-                rating: element.rating,
-                originalPrice: element.originalPrice
-            });
+        packages.forEach((element, i) => {
+            element = element.toJSON();
+            packages[i] = element;
+            element.packages.forEach(package => {
+                package['packageId'] = package._id;
+                package['image'] = package.bigImage;
+            })
         });
 
         res.status(200).json({
             message: 'packages fetched',
-            data: data,
+            data: packages,
             success: true
         });
     } catch (error) {
         res.status(400).json({
-            message: error,
+            message: error.message,
             success: false
         });
     }
@@ -95,7 +83,7 @@ module.exports.packageById = async(req,res)=>{
         
     } catch (error) {
         res.status(400).json({
-            message: error,
+            message: error.message,
             success: false
         });
     }

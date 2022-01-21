@@ -37,7 +37,11 @@ module.exports.createReferralLink = async (req, res) => {
                     coupen.generatedUsers.set(userId, coupen.noOfReferralsReq);
                     await coupen.save();
                 }
-                referralData = {userId, coupenId};
+                let refsReqired = coupen.noOfReferralsReq;
+                let refsCompleted = refsReqired - coupen.generatedUsers.get(userId);
+                let generatorDiscount = coupen.generatorDiscount;
+                let receiverDiscount = coupen.receiverDiscount;
+                referralData = {userId, coupenId, refsReqired, refsCompleted, generatorDiscount, receiverDiscount};
                 isCoupen = true;
                 msg = 'successfully generated referral link.'
             }else{

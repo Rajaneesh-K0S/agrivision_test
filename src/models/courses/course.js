@@ -15,6 +15,7 @@ const courseSchema = new Schema({
     name:String,
     exam:[String],
     subject:[String],
+    show : Boolean,         // to show or hide a course 
     bigImage:String,
     smallImage:String,
     duration:Number,
@@ -52,10 +53,23 @@ const courseSchema = new Schema({
     }
 });
 
+const packageCategoriesSchema = new Schema({
+    name : String,
+    packages : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Package'
+    }],
+    exam : [String],
+    subject : [String],
+    show : Boolean,                     // to show or hide a package category
+    sortOrder : Number                  // for sorting the categories.
+})
+
 const packageSchema = new Schema({
     name:String,
     exam:[String],
     subject:[String],
+    show : Boolean,                     // to show or hide a package
     type: Number,        // 0 for MEGA, 1 for MICRO, 2 for NANO, 3 for CRASH, 4 for NUCLEUS
     optionalSubject: String,
     bigImage:String,
@@ -115,5 +129,6 @@ const packageSchema = new Schema({
 const Course = mongoose.model('Course', courseSchema);
 const Review = mongoose.model('Review', reviewSchema);
 const Package = mongoose.model('Package',packageSchema)
-module.exports = { Course, Review, Package };
+const PackageCategory = mongoose.model('PackageCategory', packageCategoriesSchema);
+module.exports = { Course, Review, Package, PackageCategory};
 
