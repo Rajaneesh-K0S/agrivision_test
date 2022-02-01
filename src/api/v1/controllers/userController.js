@@ -1,7 +1,9 @@
-const { User, Package } = require('../../../models');
+const { User, Package,Course } = require('../../../models');
 const bcrypt = require('bcrypt');
 const { randString, generateToken } = require('../../../utils');
 const transporter= require('../../../config/nodemailer');
+
+
 
 
 // const { boolean } = require('joi');
@@ -253,6 +255,11 @@ module.exports.confirmEmail = async function (req, res) {
         if (user) {
             user.isVerified = true;
             user.randString = null;
+            let pya=await Course.findById("61f8f42394a320857a633a4d");
+           
+            
+            user.courses.push(pya);
+        
             await user.save();
             let token = generateToken(user);
 
