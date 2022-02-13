@@ -36,6 +36,7 @@ module.exports.Subject = exportedTestSeriesObject.Subject;
 module.exports.Quiz = require('./quiz/quiz');
 module.exports.Question = require('./quiz/question');
 module.exports.Rank = require('./quiz/rank')
+module.exports.Registration = require('./quiz/registration')
 
 
 module.exports.Coupen = require('./coupen');

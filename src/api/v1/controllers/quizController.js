@@ -1,4 +1,4 @@
-const { Question, Quiz, Rank, Course, TestSeries, User } = require("../../../models");
+const { Question, Quiz, Rank, Course, TestSeries, User,Registration } = require("../../../models");
 const { getLocalTimeString } = require('../../../utils')
 
 let markedAnsData = async (quizId, userId) => {
@@ -530,3 +530,53 @@ module.exports.getAnalysis = async (req, res) => {
 
 
 
+module.exports.quizRegistration = async (req,res)=>{
+    try{
+        const quizId = req.params.id;
+        const {contact,college,currentYear,givenGate} = req.body;
+        const quiz =await Registration.findOne({'current':true});
+        let flag=0;
+        quiz.usersEnrolled.forEach(user=>{
+            if(user.userId==req.user._id){
+                flag=1;
+            }
+        })
+        let msg;
+        if(flag==0){
+            quiz.usersEnrolled.push({
+                userId: req.user._id,
+                name: req.user.name,
+                email:req.user.email,
+                contact:contact,
+                college:college,
+                currentYear:currentYear,
+                givenGate:givenGate
+    
+            })
+            await quiz.save();
+            console.log('hey')
+            const q=await Quiz.findById(quizId);
+            const u=await User.findById(req.user._id)
+            q.registeredUsers.push(u);
+            await q.save();
+            msg='Successfuly registered for quiz'
+
+        }else{
+            msg='You are already registered for quiz'
+        }
+        
+
+        res.status(200).json({
+            message:msg,
+            success: true
+        })
+
+
+    }
+    catch(error){
+        res.status(400).json({
+            message: error.message,
+            success: false
+        })
+    }
+}

@@ -1,4 +1,4 @@
-const { TestSeries, Subject, User, Quiz } = require('../../../models');
+const { TestSeries, Subject, User, Quiz ,Registration} = require('../../../models');
 
 
 module.exports.allTestSeries = async function (req, res) {
@@ -87,6 +87,16 @@ module.exports.allTestSeries = async function (req, res) {
             
 
             data = {'fullLengthTest': fullLengthTest, 'freeQuizes':freeQuizes,'subjectWiseQuizes':[...subjectWiseQuizes], 'chapterWiseQuizes':[...chapterWiseQuizes]};
+        }
+
+        if(req.query.page==3){
+            const quiz =await Registration.findOne({'current':true});
+            data = {
+                'quizName':quiz.examName,
+                'date':quiz.date,
+                'time':quiz.time,
+                'quizId':quiz.quizId
+            }
         }
 
         res.status(200).json({
