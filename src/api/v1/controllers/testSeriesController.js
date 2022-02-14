@@ -90,12 +90,24 @@ module.exports.allTestSeries = async function (req, res) {
         }
 
         if(req.query.page==3){
+            
             const quiz =await Registration.findOne({'current':true});
+            let isAlreadyRegistered=false;
+            if(req.query.userId){
+
+                quiz.usersEnrolled.forEach(user=>{
+                    if(user.userId==req.query.userId){
+                        isAlreadyRegistered=true;
+                    }
+                })
+            }
+            
             data = {
                 'quizName':quiz.examName,
                 'date':quiz.date,
                 'time':quiz.time,
-                'quizId':quiz.quizId
+                'quizId':quiz.quizId,
+                'isAlreadyRegistered':isAlreadyRegistered
             }
         }
 
