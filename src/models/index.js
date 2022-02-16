@@ -40,3 +40,4 @@ module.exports.Registration = require('./quiz/registration')
 
 
 module.exports.Coupen = require('./coupen');
+module.exports.ReferralData = require('./referralData');

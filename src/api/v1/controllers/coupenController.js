@@ -1,4 +1,5 @@
 const {Coupen, Course, TestSeries, Package} = require('../../../models');
+const {findDiscount}  = require('../../../utils/index')
 
 let findCoupenId = async (item, itemId) => {
     let coupenId = '';
@@ -18,8 +19,6 @@ let findCoupenId = async (item, itemId) => {
     catch(err){
         throw new Error(err.message);
     }
-   
-    
 }
 
 module.exports.createReferralLink = async (req, res) => {
@@ -32,16 +31,18 @@ module.exports.createReferralLink = async (req, res) => {
         let referralData = {};
         if(coupenId){
             let coupen = await Coupen.findOne({_id : coupenId});
-            if(coupen.type == 1 && coupen.active){
+            if(((coupen.type == 1) || (coupen.type == 2)) && coupen.active){
                 if(!coupen.generatedUsers.has(userId.toString())){
-                    coupen.generatedUsers.set(userId, coupen.noOfReferralsReq);
+                    let setVal = (coupen.type == 1)?(coupen.noOfReferralsReq):(0);
+                    coupen.generatedUsers.set(userId, setVal);
                     await coupen.save();
                 }
                 let refsReqired = coupen.noOfReferralsReq;
                 let refsCompleted = refsReqired - coupen.generatedUsers.get(userId);
-                let generatorDiscount = coupen.generatorDiscount;
-                let receiverDiscount = coupen.receiverDiscount;
-                referralData = {userId, coupenId, refsReqired, refsCompleted, generatorDiscount, receiverDiscount};
+                let generatorDiscount = findDiscount(coupen.generatorDiscount);
+                let receiverDiscount = findDiscount(coupen.receiverDiscount);
+                let coupenType = coupen.type;
+                referralData = {userId, coupenId, coupenType, refsReqired, refsCompleted, generatorDiscount, receiverDiscount};
                 isCoupen = true;
                 msg = 'successfully generated referral link.'
             }else{
@@ -82,10 +83,22 @@ module.exports.useReferralLink = async (req, res) => {
             let coupenId = await findCoupenId(item, itemId);
             if(coupen == coupenId){
                 let coup = await Coupen.findById(coupenId);
-                if(coup.type == 1 && coup.active){
-                    discount = coup.receiverDiscount;
-                    isCoupen = true;
-                    msg = "successfully applied discount.";
+                if(((coup.type == 1) || (coup.type == 2)) && coup.active){
+                    if(coup.generatedUsers.has(generator)){
+                        let val = coup.generatedUsers.get(generator);
+                        if(val == 0 && coupen.type == 1){
+                            isCoupen = false;
+                            msg = "Maximum number of redeems has been reached.";
+                        }else{
+                            discount = coup.receiverDiscount;
+                            discount = findDiscount(discount);
+                            isCoupen = true;
+                            msg = "successfully applied discount.";
+                        }
+                    }else{
+                        isCoupen = false;
+                        msg = "Invalid Referral link or the maximum number of redeems has been reached.";
+                    }
                 }else{
                     isCoupen = false;
                     msg = "Coupen is not valid or has expired.";
@@ -124,13 +137,16 @@ module.exports.applyDiscountForGeneratorUser = async (req, res) => {
         let coupenId = await findCoupenId(item, itemId);
         if(coupenId){
             let coupen = await Coupen.findById(coupenId);
-            if(coupen.type == 1 && coupen.active){
+            if((coupen.type == 1 || coupen.type == 2) && coupen.active){
                 if(coupen.generatedUsers.has(userId.toString())){
                     let val = coupen.generatedUsers.get(userId);
-                    if(val == 0){
-                        discount = coupen.generatorDiscount;
+                    if(coupen.type == 1 && val == 0){
+                        discount = findDiscount(coupen.generatorDiscount);
                         isCoupen = true;
                         msg = "successfully applied discount."
+                    }else if(coupen.type == 2){
+                        isCoupen = false;
+                        msg = "Cashback will be credited within 2 days after someone makes payment from your referral link."
                     }else{
                         isCoupen = false;
                         msg = "You have not completed the number of referrals."
@@ -178,7 +194,7 @@ module.exports.checkoutDiscount = async (req, res) => {
         if(coupen && coupen.type == 0){
             coupenId = coupen._id;
             if(coupen.active && coupen.noOfRedeems){
-                discount = coupen.discount;
+                discount = findDiscount(coupen.discount);
                 isCoupen = true;
                 msg = "Discount applied successfully."
             }else{

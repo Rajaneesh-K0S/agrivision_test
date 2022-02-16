@@ -12,9 +12,9 @@ const coupenSchema = new Schema({
     },
     type : Number, // [0 for coupens on checkout page, 1 for share and earn]
                                       // all discounts in percentage.
-    discount : Number,                // normal discount for type 0 coupens.
-    generatorDiscount : Number,       // discount for the user who has generated the referral link.
-    receiverDiscount : Number,        // discount for the user who is using referral link.
+    discount : String,                // normal discount for type 0 coupens.
+    generatorDiscount : String,       // discount for the user who has generated the referral link.
+    receiverDiscount : String,        // discount for the user who is using referral link.
     noOfReferralsReq : {    // no of referrals req for type 1 coupens.
         type : Number, 
         default : 1

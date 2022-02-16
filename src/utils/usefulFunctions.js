@@ -35,3 +35,12 @@ module.exports.getLocalTimeString = (Date)=>{
     return dateString;
 }
 
+
+
+module.exports.findDiscount = (discount) => {
+    if(discount.includes('%')){
+        return {discountType : 0, discount : parseInt(discount.split('%')[0])};
+    }else{
+        return {discountType : 1, discount : parseInt(discount)};
+    }
+}

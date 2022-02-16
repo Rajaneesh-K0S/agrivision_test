@@ -1,9 +1,10 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { User, Course, TestSeries, Package, Coupen, Article } = require('../../../models');
-const { generateRandomToken } = require('../../../utils/index');
+const { User, Course, TestSeries, Package, Coupen, ReferralData, Article } = require('../../../models');
+const { generateRandomToken, findDiscount } = require('../../../utils/index');
 const transporter = require('../../../config/nodemailer');
+
 
 let returnIndividualPrice = async (item, type)=>{
     try{
@@ -65,13 +66,16 @@ let calculatePaymentAmount = async (entities) =>{
                 }
             }
             if(entity.type == 4){
-                let coupen = await Coupen.findOne({_id : entity.item.coupenId}, {"discount" : 1, "generatorDiscount" : 1, "receiverDiscount" : 1});
-                if(entity.item.case == 0){
-                    totalAmount -= Math.ceil((totalAmount*coupen.generatorDiscount)/100);
+                let coupen = await Coupen.findOne({_id : entity.item.coupenId}, {"discount" : 1, "generatorDiscount" : 1, "receiverDiscount" : 1, "type" : 1});
+                if(entity.item.case == 0 && coupen.type == 1){
+                    generatorDiscount = findDiscount(coupen.generatorDiscount);
+                    totalAmount -= (generatorDiscount.discountType == 0)?(Math.ceil((totalAmount*generatorDiscount.discount)/100)):(generatorDiscount.discount);
                 }else if(entity.item.case == 1){
-                    totalAmount -= Math.ceil((totalAmount*coupen.receiverDiscount)/100);
+                    receiverDiscount = findDiscount(coupen.receiverDiscount);
+                    totalAmount -= (receiverDiscount.discountType == 0)?(Math.ceil((totalAmount*receiverDiscount.discount)/100)):(receiverDiscount.discount);
                 }else if(entity.item.case == 2){
-                    totalAmount -= Math.ceil((totalAmount*coupen.discount)/100);
+                    disc = findDiscount(coupen.discount);
+                    totalAmount -= (disc.discountType == 0)?(Math.ceil((totalAmount*disc.discount)/100)):(disc.discount);
                 }
             }
         }
@@ -80,6 +84,85 @@ let calculatePaymentAmount = async (entities) =>{
     catch(err){
         throw err;
     }
+}
+
+let findItem = (courseIds, packageIds, testSeriesIds)=>{
+    try{
+        if(courseIds.length){
+            return {item : 0, itemId : courseIds[0]};
+        }
+        else if(packageIds.length){
+            return {item : 1, itemId : packageIds[0]};
+        }
+        else if(testSeriesIds.length){
+            return {item : 2, itemId : testSeriesIds[0]};
+        }
+    }
+    catch(err){
+        throw new Error(err);
+    }
+}
+
+let shareAndEarnPostCalc = async (shareAndEarnString, userId, courseIds, testSeriesIds, packageIds) => {
+    try{
+        if (shareAndEarnString) {
+            let arr = shareAndEarnString.split('$');
+            let generatorId = arr[1];
+            let coupenId = arr[2];
+            let coupen = await Coupen.findById(coupenId);
+            if (arr[0] == 1) {       // 0 for generator, 1 for receiver.
+                let val = coupen.generatedUsers.get(generatorId.toString());
+                if(coupen.type == 1){
+                    val -= 1;
+                }else if(coupen.type == 2){
+                    let referralData = await ReferralData.findOne({generatorUserId : generatorId});
+                    let {item, itemId} = findItem(courseIds, packageIds, testSeriesIds);
+                    console.log(item, itemId);
+                    if(referralData){
+                        referralData.completedReferrals.push({
+                            date: new Date(),
+                            referredUserId: userId,
+                            itemType: item,
+                            itemId: itemId,
+                        })
+                        referralData.newReferrals++;
+                        await referralData.save();
+                    }else{
+                        let referralData = new ReferralData({
+                            generatorUserId: generatorId,
+                            newReferrals: 1,
+                            completedReferrals: [{
+                                date: new Date(),
+                                referredUserId: userId,
+                                itemType: item,
+                                itemId: itemId,
+                            }]
+                        })
+                        await referralData.save();
+                    }
+                    val += 1;
+                }
+                coupen.generatedUsers.set(generatorId, val);
+                await coupen.save();
+            } else if (arr[0] == 0 && coupen.type == 1) {
+                if(coupen.generatedUsers.get(generatorId) == 0){
+                    coupen.generatedUsers.delete(generatorId);
+                }
+                await coupen.save();
+            } else if (arr[0] == 2) {
+                let val = coupen.noOfRedeems;
+                val -= 1;
+                coupen.noOfRedeems = val;
+                if (val == 0) {
+                    coupen.active = false;
+                }
+                await coupen.save();
+            }
+        }
+    }catch(err){
+        throw new Error(err);
+    }
+    
 }
 
 
@@ -251,29 +334,7 @@ module.exports.success = async (req, res) => {
         let paymentDetails = { courseIds, testSeriesIds, packageIds, orderId, time: Date.now(), amount }
         await User.updateOne({ _id: userId }, { '$push': { 'paymentHistory': paymentDetails } });
 
-        if (shareAndEarnString) {
-            let arr = shareAndEarnString.split('$');
-            let generatorId = arr[1];
-            let coupenId = arr[2];
-            let coupen = await Coupen.findById(coupenId);
-            if (arr[0] == 1) {       // 0 for generator, 1 for receiver.
-                let val = coupen.generatedUsers.get(generatorId.toString());
-                val -= 1;
-                coupen.generatedUsers.set(generatorId, val);
-                await coupen.save();
-            } else if (arr[0] == 0) {
-                coupen.generatedUsers.delete(generatorId);
-                await coupen.save();
-            } else if (arr[0] == 2) {
-                let val = coupen.noOfRedeems;
-                val -= 1;
-                coupen.noOfRedeems = val;
-                if (val == 0) {
-                    coupen.active = false;
-                }
-                await coupen.save();
-            }
-        }
+        await shareAndEarnPostCalc(shareAndEarnString, userId, courseIds, testSeriesIds, packageIds);
         res.status(200).json({
             msg: 'success',
             orderId
