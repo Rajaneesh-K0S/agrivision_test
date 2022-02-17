@@ -117,7 +117,6 @@ let shareAndEarnPostCalc = async (shareAndEarnString, userId, courseIds, testSer
                 }else if(coupen.type == 2){
                     let referralData = await ReferralData.findOne({generatorUserId : generatorId});
                     let {item, itemId} = findItem(courseIds, packageIds, testSeriesIds);
-                    console.log(item, itemId);
                     if(referralData){
                         referralData.completedReferrals.push({
                             date: new Date(),
