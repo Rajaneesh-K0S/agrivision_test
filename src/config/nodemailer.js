@@ -1,24 +1,23 @@
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const oAuth2Client = new google.auth.OAuth2(process.env.prod_clientId, process.env.prod_clientSecret, process.env.redirectURI);
-oAuth2Client.setCredentials({ refresh_token:process.env.prod_refreshToken });
-// const path = require('path');
+var nodemailer = require('nodemailer');
+var sesTransport = require('nodemailer-ses-transport');
+var aws= require("aws-sdk");
 
-async function getAccessToken(){
-    const accessToken = await oAuth2Client.getAccessToken;
-    return accessToken;
-}
+const SES_AWS_ACCESS_KEY_ID = process.env.sesEmailAccessKeyId ;  
+const SES_AWS_SECRET_ACCESS_KEY = process.env.sesEmailSecretAccessKey;
 
-const transporter = nodemailer.createTransport({
-    service:'gmail',
-    auth: {
-        type:'OAuth2',
-        user:'agrivision4u.official@gmail.com',
-        clientId: process.env.prod_clientId,
-        clientSecret: process.env.prod_clientSecret,
-        refreshToken: process.env.prod_refreshToken,
-        accessToken: getAccessToken()
-    }
+const ses = new aws.SES({
+  apiVersion: '2010-12-01',
+  region: process.env.sesEmailRegion,  
+  credentials: {
+      secretAccessKey: SES_AWS_SECRET_ACCESS_KEY,
+      accessKeyId: SES_AWS_ACCESS_KEY_ID
+  }
 });
+
+
+let transporter = nodemailer.createTransport({
+  SES: { ses, aws }
+});
+
 
 module.exports = transporter;
