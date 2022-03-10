@@ -44,3 +44,11 @@ module.exports.findDiscount = (discount) => {
         return {discountType : 1, discount : parseInt(discount)};
     }
 }
+
+module.exports.generateOTP = ()=>{
+    let otp="";
+    for(var i=0;i<6;i++){
+        otp=otp+Math.floor(Math.random()*10);
+    }
+    return otp;
+}

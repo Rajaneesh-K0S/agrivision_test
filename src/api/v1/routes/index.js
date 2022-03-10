@@ -23,6 +23,7 @@ router.use('/academics', require('./academics'));
 router.use('/carousels', require("./carousel"));
 router.use('/newsletter', require("./newsletter"));
 router.use('/notifications', require("./notifications"));
+router.use('/sms',require('./sms'));
 
 
 router.get('/', (req, res) => {
