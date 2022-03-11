@@ -29,6 +29,9 @@ const registrationSchema = new Schema({
             type:Number,
             required: true
         },
+        parentContact: {
+            type:Number
+        },
         college: {
             type:String
         },
