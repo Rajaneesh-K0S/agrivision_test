@@ -531,55 +531,38 @@ module.exports.getAnalysis = async (req, res) => {
 
 
 
-module.exports.quizRegistration = async (req,res)=>{
-    try{
+module.exports.quizRegistration = async (req, res) => {
+    try {
         const quizId = req.params.id;
-        const {contact, parentContact, college,currentYear,givenGate, otp} = req.body;
-        let user = await User.findOne({_id : req.user._id, randString : otp});
-        if(!user){
-            res.status(400).json({
-                message : "Entered Otp is not correct.",
-                success : false
+        const userId = req.user._id;
+        const { contact, parentContact, college, currentYear, givenGate } = req.body;
+        const registration = await Registration.findOne({ 'current': true }, {"usersEnrolled" : 1});
+        const quiz = await Quiz.findOne({_id : quizId}, {"registeredUsers" : 1});
+        let msg;
+        if(!quiz.registeredUsers.includes(userId)){
+            registration.usersEnrolled.push({
+                userId: req.user._id,
+                name: req.user.name,
+                email: req.user.email,
+                contact: contact,
+                parentContact: parentContact,
+                college: college,
+                currentYear: currentYear,
+                givenGate: givenGate
             })
+            await registration.save();
+            quiz.registeredUsers.push(userId);
+            await quiz.save();
+            msg = 'Successfuly registered for quiz'
         }else{
-            const quiz =await Registration.findOne({'current':true});
-            let flag=0;
-            quiz.usersEnrolled.forEach(user=>{
-                if(user.userId==req.user._id){
-                    flag=1;
-                }
-            })
-            let msg;
-            if(flag==0){
-                quiz.usersEnrolled.push({
-                    userId: req.user._id,
-                    name: req.user.name,
-                    email:req.user.email,
-                    contact:contact,
-                    parentContact : parentContact,
-                    college:college,
-                    currentYear:currentYear,
-                    givenGate:givenGate
-                })
-                await quiz.save();
-                console.log('hey')
-                const q=await Quiz.findById(quizId);
-                const u=await User.findById(req.user._id)
-                q.registeredUsers.push(u);
-                await q.save();
-                msg='Successfuly registered for quiz'
-            }else{
-                msg='You are already registered for quiz'
-            }
-    
-            res.status(200).json({
-                message:msg,
-                success: true
-            })
+            msg = 'You are already registered for quiz'
         }
-        
+        res.status(200).json({
+            message: msg,
+            success: true
+        })
     }
-    catch(error){
+    catch (error) {
         res.status(500).json({
             message: error.message,
             success: false
