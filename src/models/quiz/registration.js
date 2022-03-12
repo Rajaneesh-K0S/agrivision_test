@@ -40,6 +40,12 @@ const registrationSchema = new Schema({
         },
         givenGate: {
             type:Boolean
+        },
+        ownerCode : {
+            type : String
+        },
+        friendCode : {
+            type : String
         }
     }]
 

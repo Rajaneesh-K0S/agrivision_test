@@ -535,11 +535,13 @@ module.exports.quizRegistration = async (req, res) => {
     try {
         const quizId = req.params.id;
         const userId = req.user._id;
-        const { contact, parentContact, college, currentYear, givenGate } = req.body;
+        const { contact, parentContact, college, currentYear, givenGate, friendCode } = req.body;
         const registration = await Registration.findOne({ 'current': true }, {"usersEnrolled" : 1});
         const quiz = await Quiz.findOne({_id : quizId}, {"registeredUsers" : 1});
         let msg;
+        let randomCode;
         if(!quiz.registeredUsers.includes(userId)){
+            randomCode = "AGV" + String(registration.usersEnrolled.length).padStart(3, '0') + "TH";
             registration.usersEnrolled.push({
                 userId: req.user._id,
                 name: req.user.name,
@@ -548,17 +550,21 @@ module.exports.quizRegistration = async (req, res) => {
                 parentContact: parentContact,
                 college: college,
                 currentYear: currentYear,
-                givenGate: givenGate
+                givenGate: givenGate,
+                ownerCode: randomCode,
+                friendCode: friendCode
             })
             await registration.save();
             quiz.registeredUsers.push(userId);
             await quiz.save();
             msg = 'Successfuly registered for quiz'
         }else{
+            randomCode = registration.usersEnrolled.filter(obj=> obj.userId == userId)[0].ownerCode;
             msg = 'You are already registered for quiz'
         }
         res.status(200).json({
             message: msg,
+            randomCode: randomCode,
             success: true
         })
     }
