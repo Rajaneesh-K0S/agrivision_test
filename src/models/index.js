@@ -39,5 +39,7 @@ module.exports.Rank = require('./quiz/rank')
 module.exports.Registration = require('./quiz/registration')
 
 
-module.exports.Coupen = require('./coupen');
+let CoupenObj = require('./coupen');
+module.exports.CoupenType = CoupenObj.CoupenType;
+module.exports.Coupen = CoupenObj.Coupen;
 module.exports.ReferralData = require('./referralData');

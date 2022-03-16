@@ -52,3 +52,6 @@ module.exports.generateOTP = ()=>{
     }
     return otp;
 }
+
+
+module.exports.generatePromoCode 

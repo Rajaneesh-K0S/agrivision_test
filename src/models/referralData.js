@@ -10,12 +10,13 @@ let referralDataSchema = new Schema({
     completedReferrals: [{
         date: Date,                               // date when the referred user has done payment.
         referredUserId: { type: Schema.Types.ObjectId, ref: 'User' },
-        itemType: Number,
+        itemType: Number,                         // 0 for courses, 1 for testseries, 2 for packages
         itemId: { type: Schema.Types.ObjectId },
-        status: {type : Number, default : 0},       // 0 for new referals, 1 for paid, 2 for rejected;
+        status: {type : Number, default : 0},       // 0 for new referals, 1 for paid, 2 for rejected, 3 for pending;
         paidAmount : { type: Number, default: 0 },
+        expectedPayment : Number,                   // cashback expected by referre.
         paymentId : String,
-        paymentDate : Date,                  // date when we have given cashback to the ca.
+        paymentDate : Date,                          // date when we have given cashback to the ca.
         comment : String
     }]
 })
