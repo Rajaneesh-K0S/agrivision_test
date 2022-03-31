@@ -242,38 +242,86 @@ module.exports.startQuiz = async (req, res) => {
     let userId = req.user._id;
     let quizId = req.params.id;
     try {
-        const quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
-        if (req.body.isSubscribed) {
-            let isAttempted = false;
-            let msg = '';
-            let rank = await Rank.findOne({ userId, quizId });
-            if (!rank) {
-                let startTime = Date.now();
-                
-                rank = new Rank({ quizId, userId, userName: req.user.name, startTime, unattempted: quiz.totalNoQuestions, markedAns: {} });
-                await rank.save();
-                msg = 'quiz was successfully found and sent';
-            } else if (!rank.isSubmitted) {
-                msg = 'quiz was successfully found and sent';
-            } else if (rank.isSubmitted) {
-                isAttempted = true;
-                msg = 'You have already attempted the quiz';
-            }
-            res.status(200).json({
-                isSubscribed: true,
-                isAttempted,
-                data: (req.body.isSubscribed) ? quiz : null,
-                message: msg,
-                success: true
-            });
+        let quiz = await Quiz.findById(quizId).populate({ path: 'sections', populate: { path: 'questions' } });
+        if(quiz.isShuffled){
+            if (req.body.isSubscribed) {
+                let isAttempted = false;
+                let msg = '';
+                let rank = await Rank.findOne({ userId, quizId });
+                if (!rank) {
+                    let startTime = Date.now();
+                    for(let i =0; i< quiz.sections.length; i++){
+                        let section = quiz.sections[i].toJSON();
+                        let shuffled_questions = shuffle_q(section.questions, 25);
+                        section.questions = shuffled_questions;
+                        quiz.sections[i] = section;
+                    }
+                    rank = new Rank({ quizId, userId, userName: req.user.name, startTime, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                    await rank.save();
+                    msg = 'quiz was successfully found and sent';
+                } else if (!rank.isSubmitted) {
+                    for(let i =0; i< quiz.sections.length; i++){
+                        let section = quiz.sections[i].toJSON();
+                        let shuffled_questions = shuffle_q(section.questions, 25);
+                        section.questions = shuffled_questions;
+                        quiz.sections[i] = section;
+                    }
+                    msg = 'quiz was successfully found and sent';
+                } else if (rank.isSubmitted) {
+                    isAttempted = true;
+                    msg = 'You have already attempted the quiz';
+                }
+                // console.log(quiz, "hi");
+                res.status(200).json({
+                    isSubscribed: true,
+                    isAttempted,
+                    data: (req.body.isSubscribed) ? quiz : null,
+                    message: msg,
+                    success: true
+                });
 
-        } else {
-            res.status(200).json({
-                isSubscribed: false,
-                data: quiz,
-                message: "You are not registered for this quiz.",
-                success: true
-            })
+            } else {
+                res.status(200).json({
+                    isSubscribed: false,
+                    data: quiz,
+                    message: "You are not registered for this quiz.",
+                    success: true
+                })
+            }
+        }else{
+            if (req.body.isSubscribed) {
+                let isAttempted = false;
+                let msg = '';
+                let rank = await Rank.findOne({ userId, quizId });
+                if (!rank) {
+                    let startTime = Date.now();
+                    
+                    rank = new Rank({ quizId, userId, userName: req.user.name, startTime, unattempted: quiz.totalNoQuestions, markedAns: {} });
+                    await rank.save();
+                    msg = 'quiz was successfully found and sent';
+                } else if (!rank.isSubmitted) {
+                    msg = 'quiz was successfully found and sent';
+                } else if (rank.isSubmitted) {
+                    isAttempted = true;
+                    msg = 'You have already attempted the quiz';
+                }
+                // console.log(quiz, "bi");
+                res.status(200).json({
+                    isSubscribed: true,
+                    isAttempted,
+                    data: (req.body.isSubscribed) ? quiz : null,
+                    message: msg,
+                    success: true
+                });
+
+            } else {
+                res.status(200).json({
+                    isSubscribed: false,
+                    data: quiz,
+                    message: "You are not registered for this quiz.",
+                    success: true
+                })
+            }
         }
     } catch (err) {
         return res.status(500).json({
@@ -575,3 +623,16 @@ module.exports.quizRegistration = async (req, res) => {
         })
     }
 }
+//its a fischer yates function which takes parameters as array and number of questions required
+let shuffle_q = (array, no_questions) => {
+    let i = array.length - 1;
+    while (i != 0) {
+        var r = Math.floor(Math.random() * i);
+        var t = array[i];
+        array[i] = array[r];
+        array[r] = t;
+        i--;
+    }
+    return array.slice(0, no_questions);
+}
+

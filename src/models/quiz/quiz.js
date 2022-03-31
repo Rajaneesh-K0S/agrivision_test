@@ -21,6 +21,8 @@ const quizTableSchema = new Schema({
         }]
     }],
     totalNoQuestions : Number,
+    isShuffled : Boolean,
+    isNavigationDisabled : Boolean,
     maxScore : Number,
     exam: String,
     chapter: String,
