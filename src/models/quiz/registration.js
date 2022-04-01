@@ -22,8 +22,7 @@ const registrationSchema = new Schema({
         }],
         email: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         contact: {
             type:Number,
