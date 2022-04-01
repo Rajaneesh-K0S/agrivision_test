@@ -252,7 +252,7 @@ module.exports.startQuiz = async (req, res) => {
                     let startTime = Date.now();
                     for(let i =0; i< quiz.sections.length; i++){
                         let section = quiz.sections[i].toJSON();
-                        let shuffled_questions = shuffle_q(section.questions, 25);
+                        let shuffled_questions = shuffle_q(section.questions, 30);
                         section.questions = shuffled_questions;
                         quiz.sections[i] = section;
                     }
@@ -262,7 +262,7 @@ module.exports.startQuiz = async (req, res) => {
                 } else if (!rank.isSubmitted) {
                     for(let i =0; i< quiz.sections.length; i++){
                         let section = quiz.sections[i].toJSON();
-                        let shuffled_questions = shuffle_q(section.questions, 25);
+                        let shuffled_questions = shuffle_q(section.questions, 30);
                         section.questions = shuffled_questions;
                         quiz.sections[i] = section;
                     }
