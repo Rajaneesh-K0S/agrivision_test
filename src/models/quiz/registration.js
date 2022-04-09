@@ -31,6 +31,9 @@ const registrationSchema = new Schema({
         parentContact: {
             type:Number
         },
+        branch : String,
+        specialization : String,
+        state : String,
         college: {
             type:String
         },

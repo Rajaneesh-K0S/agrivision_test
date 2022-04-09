@@ -583,7 +583,7 @@ module.exports.quizRegistration = async (req, res) => {
     try {
         const quizId = req.params.id;
         const userId = req.user._id;
-        const { contact, parentContact, college, currentYear, givenGate, friendCode } = req.body;
+        const { contact, parentContact, branch, specialization, state, college, currentYear, givenGate, friendCode } = req.body;
         const registration = await Registration.findOne({ 'current': true }, {"usersEnrolled" : 1});
         const quiz = await Quiz.findOne({_id : quizId}, {"registeredUsers" : 1});
         let msg;
@@ -596,6 +596,9 @@ module.exports.quizRegistration = async (req, res) => {
                 email: req.user.email,
                 contact: contact,
                 parentContact: parentContact,
+                branch: branch,
+                specialization: specialization,
+                state: state,
                 college: college,
                 currentYear: currentYear,
                 givenGate: givenGate,
