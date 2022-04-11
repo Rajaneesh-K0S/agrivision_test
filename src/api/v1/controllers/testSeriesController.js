@@ -93,11 +93,13 @@ module.exports.allTestSeries = async function (req, res) {
             
             const quiz =await Registration.findOne({'current':true});
             let isAlreadyRegistered=false;
+            let randomCode = "";
             if(req.query.userId){
 
                 quiz.usersEnrolled.forEach(user=>{
                     if(user.userId==req.query.userId){
                         isAlreadyRegistered=true;
+                        randomCode = user.ownerCode;
                     }
                 })
             }
@@ -107,7 +109,8 @@ module.exports.allTestSeries = async function (req, res) {
                 'date':quiz.date,
                 'time':quiz.time,
                 'quizId':quiz.quizId,
-                'isAlreadyRegistered':isAlreadyRegistered
+                'isAlreadyRegistered':isAlreadyRegistered,
+                randomCode: randomCode
             }
         }
 
