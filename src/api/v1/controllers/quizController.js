@@ -250,9 +250,18 @@ module.exports.startQuiz = async (req, res) => {
                 let rank = await Rank.findOne({ userId, quizId });
                 if (!rank) {
                     let startTime = Date.now();
+                    if(quiz.quizType != 0){
+                        quiz.startTime = startTime;
+                    }
                     for(let i =0; i< quiz.sections.length; i++){
                         let section = quiz.sections[i].toJSON();
-                        let shuffled_questions = shuffle_q(section.questions, 30);
+                        let shuffled_questions;
+                        if(i == 0){
+                            shuffled_questions = shuffle_q(section.questions, 40);
+                        }
+                        else{
+                            shuffled_questions = shuffle_q(section.questions, 12)
+                        }
                         section.questions = shuffled_questions;
                         quiz.sections[i] = section;
                     }
@@ -260,9 +269,18 @@ module.exports.startQuiz = async (req, res) => {
                     await rank.save();
                     msg = 'quiz was successfully found and sent';
                 } else if (!rank.isSubmitted) {
+                    if(quiz.quizType != 0){
+                        quiz.startTime = rank.startTime;
+                    }
                     for(let i =0; i< quiz.sections.length; i++){
                         let section = quiz.sections[i].toJSON();
-                        let shuffled_questions = shuffle_q(section.questions, 30);
+                        let shuffled_questions;
+                        if(i == 0){
+                            shuffled_questions = shuffle_q(section.questions, 40);
+                        }
+                        else{
+                            shuffled_questions = shuffle_q(section.questions, 12)
+                        }
                         section.questions = shuffled_questions;
                         quiz.sections[i] = section;
                     }
