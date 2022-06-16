@@ -289,6 +289,9 @@ module.exports.startQuiz = async (req, res) => {
                     isAttempted = true;
                     msg = 'You have already attempted the quiz';
                 }
+                if(quiz.quizType == 1){
+                    quiz.startTime = rank.startTime;
+                }
                 // console.log(quiz, "hi");
                 res.status(200).json({
                     isSubscribed: true,
@@ -322,6 +325,9 @@ module.exports.startQuiz = async (req, res) => {
                 } else if (rank.isSubmitted) {
                     isAttempted = true;
                     msg = 'You have already attempted the quiz';
+                }
+                if(quiz.quizType == 1){
+                    quiz.startTime = rank.startTime;
                 }
                 // console.log(quiz, "bi");
                 res.status(200).json({
