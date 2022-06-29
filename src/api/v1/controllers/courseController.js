@@ -262,4 +262,28 @@ module.exports.markCompleted = async function(req, res){
     }
 };
 
+module.exports.liveClass = async function (req, res) {
+    try {
+        let courseId = req.params.id;
+        let course = await Course.findById(courseId);
+        let courseData = {};
+
+            courseData['courseId'] = course._id;
+            courseData['dateTime'] = course.dateTime;
+            courseData['platform'] = course.platform;
+            res.status(200).json({
+                data : courseData,
+                message : 'live Class data fetched successfully',
+                success : true
+            });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: error.message,
+            success: false
+        });
+    }
+};
+
 
