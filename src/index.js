@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const passport = require('passport');
@@ -8,7 +9,6 @@ const streakCalculatorJob = require('./utils/scheduledJobs/streakCalculator');
 require('./config/mongoose');
 require('./config/auth/passport-google-token');
 require('./config/auth/passportJWT');
-
 
 streakCalculatorJob.start();
 app.use(cors());
