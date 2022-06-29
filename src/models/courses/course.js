@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+require('mongoose-type-url');
 const { Schema } = mongoose;
 
 const reviewSchema = new Schema({
@@ -50,7 +51,11 @@ const courseSchema = new Schema({
     shareAndEarnCoupen : {
         type : Schema.Types.ObjectId,
         ref : 'Coupen'
-    }
+    },
+    LiveClass:{
+        dateTime: Date,
+        platform:mongoose.SchemaTypes.Url
+    },
 });
 
 const packageCategoriesSchema = new Schema({
